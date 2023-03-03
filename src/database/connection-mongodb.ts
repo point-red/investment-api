@@ -35,7 +35,7 @@ import {
   ReadManyOptionsInterface,
   UpdateOptionsInterface,
   DeleteOptionsInterface,
-  AggregrateOptionsInterface,
+  AggregateOptionsInterface,
 } from "./connection.js";
 import { fields, limit, page, skip, sort } from "./mongodb-util.js";
 import MongoError from "@src/utils/mongo-error.js";
@@ -336,7 +336,7 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     };
   }
 
-  public async aggregate(pipeline: any, query: any, options?: AggregrateOptionsInterface): Promise<unknown> {
+  public async aggregate(pipeline: any, query: any, options?: AggregateOptionsInterface): Promise<unknown> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }

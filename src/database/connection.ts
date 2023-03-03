@@ -41,7 +41,7 @@ export interface DeleteOptionsInterface {
   session: unknown;
 }
 
-export interface AggregrateOptionsInterface {
+export interface AggregateOptionsInterface {
   session: unknown;
 }
 
@@ -103,7 +103,7 @@ export interface IDatabaseAdapter {
   delete(id: string, options?: DeleteOptionsInterface): Promise<DeleteResultInterface>;
   deleteMany(id: string, options?: DeleteOptionsInterface): Promise<unknown>;
   deleteAll(options?: DeleteOptionsInterface): Promise<unknown>;
-  aggregate(pipeline: any, query: any, options?: AggregrateOptionsInterface): Promise<unknown>;
+  aggregate(pipeline: any, query: any, options?: AggregateOptionsInterface): Promise<unknown>;
 }
 
 export default class DatabaseConnection {
