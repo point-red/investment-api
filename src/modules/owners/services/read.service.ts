@@ -14,6 +14,8 @@ export class ReadOwnerService {
     const owner: OwnerInterface = {
       _id: result._id as string,
       name: result.name as string,
+      createdBy_id: result.createdBy_id as string,
+      createdAt: result.createdAt as Date,
     };
     const ownerEntity = new OwnerEntity(owner);
 

@@ -1,6 +1,6 @@
 import { OwnerEntity } from "../entities/owner.entity.js";
 import { OwnerRepository } from "../repositories/owner.repository.js";
-import DatabaseConnection, { DocumentInterface } from "@src/database/connection.js";
+import DatabaseConnection from "@src/database/connection.js";
 
 export class ArchiveOwnerService {
   private db: DatabaseConnection;
