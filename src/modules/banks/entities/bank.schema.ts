@@ -49,19 +49,11 @@ export async function createCollection(db: IDatabaseAdapter) {
           bsonType: "array",
           items: {
             bsonType: "object",
-            required: ["number", "name", "notes"],
+            required: ["number"],
             properties: {
-              name: {
-                bsonType: "string",
-                description: "must be a string and is required",
-              },
               number: {
-                bsonType: "string",
-                description: "must be a string and is required",
-              },
-              notes: {
-                bsonType: "string",
-                description: "must be a string and is required",
+                bsonType: "number",
+                description: "must be a number and is required",
               }
             },
           },
@@ -70,7 +62,19 @@ export async function createCollection(db: IDatabaseAdapter) {
     });
     await db.createIndex(
       name,
-      { name: -1, code: -1, "accounts.number": -1 },
+      { name: -1, code: -1 },
+      {
+        unique: true,
+        collation: {
+          locale: "en",
+          strength: 2,
+        },
+      }
+    );
+
+    await db.createIndex(
+      name,
+      { "accounts.number": -1  },
       {
         unique: true,
       }
