@@ -10,6 +10,7 @@ export class CreateOwnerService {
   public async handle(doc: DocumentInterface, session: unknown) {
     const ownerEntity = new OwnerEntity({
       name: doc.name,
+      createdBy_id: doc.createdBy_id
     });
 
     const ownerRepository = new OwnerRepository(this.db);

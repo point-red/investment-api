@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { validate } from "../request/create.request.js";
 import { CreateOwnerService } from "../services/create.service.js";
 import { db } from "@src/database/database.js";
+import RequestWithUser from "@src/interfaces/RequestWithUser.js";
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
     const session = db.startSession();
 
@@ -12,7 +13,10 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
     validate(req.body);
 
     const createOwnerService = new CreateOwnerService(db);
-    const result = await createOwnerService.handle(req.body, session);
+    const result = await createOwnerService.handle({
+      ...req.body, 
+      createdBy_id: req.user?._id
+    }, session);
 
     await db.commitTransaction();
 

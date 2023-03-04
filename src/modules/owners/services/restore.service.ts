@@ -9,7 +9,8 @@ export class RestoreOwnerService {
   }
   public async handle(id: string, session: unknown) {
     const ownerEntity = new OwnerEntity({
-      archivedAt: ""
+      archivedAt: "",
+      archivedBy_id: ""
     });
 
     const ownerRepository = new OwnerRepository(this.db);

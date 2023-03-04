@@ -7,9 +7,10 @@ export class ArchiveOwnerService {
   constructor(db: DatabaseConnection) {
     this.db = db;
   }
-  public async handle(id: string, session: unknown) {
+  public async handle(id: string, doc: DocumentInterface, session: unknown) {
     const ownerEntity = new OwnerEntity({
-      archivedAt: new Date()
+      archivedBy_id: doc.archivedBy_id,
+      archivedAt: new Date(),
     });
 
     const ownerRepository = new OwnerRepository(this.db);

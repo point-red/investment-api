@@ -10,6 +10,7 @@ export class UpdateOwnerService {
   public async handle(id: string, doc: DocumentInterface, session: unknown) {
     const ownerEntity = new OwnerEntity({
       name: doc.name,
+      updatedBy_id: doc.updatedBy_id
     });
 
     const ownerRepository = new OwnerRepository(this.db);
