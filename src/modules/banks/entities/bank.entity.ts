@@ -3,12 +3,12 @@ import { ObjectId } from "mongodb";
 export interface BankInterface extends CreateBankInterface {
   _id?: string | ObjectId;
   createdAt?: Date;
-  createdBy_id?: string;
+  createdBy_id?: string | ObjectId;
   updatedAt?: Date;
-  updatedBy_id?: string;
+  updatedBy_id?: string | ObjectId;
   archivedAt?: string | Date;
-  archivedBy_id?: string;
-  requestApprovalDeleteTo_id?: string;
+  archivedBy_id?: string | ObjectId;
+  requestApprovalDeleteTo_id?: string | ObjectId;
   requestApprovalDeleteAt?: Date;
   requestApprovalDeleteReason?: string;
   requestApprovalDeleteReasonReject?: string;
@@ -16,7 +16,7 @@ export interface BankInterface extends CreateBankInterface {
 }
 
 export interface BankAccount {
-  number?: string;
+  number?: number;
   name?: string;
   notes?: string;
 }
