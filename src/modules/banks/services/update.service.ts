@@ -17,6 +17,7 @@ export class UpdateBankService {
       code: doc.code,
       notes: doc.notes,
       accounts: doc.accounts,
+      updatedBy_id: doc.updatedBy_id
     });
 
     const bankRepository = new BankRepository(this.db);

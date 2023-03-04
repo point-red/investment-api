@@ -12,8 +12,8 @@ export const read = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
       _id: result._id,
       name: result.name,
-      createdAt: result.createdAt,
       createdBy_id: result.createdBy_id,
+      createdAt: result.createdAt,
     });
   } catch (error) {
     next(error);

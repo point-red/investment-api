@@ -17,6 +17,7 @@ export class CreateBankService {
       code: doc.code,
       notes: doc.notes,
       accounts: doc.accounts,
+      createdBy_id: doc.createdBy_id
     });
 
     const bankRepository = new BankRepository(this.db);

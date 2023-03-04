@@ -1,15 +1,16 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { ArchiveBankService } from "../services/archive.service.js";
 import { db } from "@src/database/database.js";
+import RequestWithUser from "@src/interfaces/RequestWithUser.js";
 
-export const archive = async (req: Request, res: Response, next: NextFunction) => {
+export const archive = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
     const session = db.startSession();
 
     db.startTransaction();
 
     const archiveBankService = new ArchiveBankService(db);
-    await archiveBankService.handle(req.params.id, session);
+    await archiveBankService.handle(req.params.id, { archivedBy_id: req.user?._id }, session);
 
     await db.commitTransaction();
 
