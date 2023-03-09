@@ -23,6 +23,7 @@ export const readMany = async (req: Request, res: Response, next: NextFunction) 
     const iQuery: QueryInterface = {
       fields: (req.query.field as string) ?? "",
       filter: (req.query.filter as any) ?? {},
+      search: (req.query.search as any) ?? {},
       page: Number(req.query.page ?? 1),
       pageSize: Number(req.query.pageSize ?? 10),
       sort: (req.query.sort as string) ?? "",

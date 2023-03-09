@@ -11,13 +11,13 @@ export const readMany = async (req: Request, res: Response, next: NextFunction) 
       fields: (req.query.fields as string) ?? "",
       restrictedFields: ["password"],
       filter: (req.query.filter as any) ?? {},
+      search: (req.query.search as any) ?? {},
       page: Number(req.query.page ?? 1),
       pageSize: Number(req.query.limit ?? 10),
       sort: (req.query.sort as string) ?? "",
     };
 
     const result = await readManyUserService.handle(query);
-    console.log(result);
 
     res.status(200).json(result);
   } catch (error) {
