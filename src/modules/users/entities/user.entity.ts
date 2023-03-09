@@ -17,6 +17,7 @@ export interface UserInterface {
   oauthVerification?: {
     google?: string;
   };
+  permissions?: string[]
 }
 
 export const restricted = ["password"];

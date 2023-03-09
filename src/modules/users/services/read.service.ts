@@ -10,7 +10,6 @@ export class ReadUserService {
   }
   public async handle(id: string, filter?: any) {
     const userRepository = new UserRepository(this.db);
-    console.log("read", id);
     const aggregates: any = [
       {
         $match: {

@@ -11,13 +11,24 @@ export interface FilterInterface {
   [key: string]: any;
 }
 
+export interface SearchInterface {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+export interface SortInterface {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 export interface QueryInterface {
   fields: string;
   restrictedFields?: string[];
+  search?: SearchInterface;
   filter: FilterInterface;
   page: number;
   pageSize: number;
-  sort: string;
+  sort: SortInterface;
 }
 
 export interface CreateOptionsInterface {
@@ -41,7 +52,7 @@ export interface DeleteOptionsInterface {
   session: unknown;
 }
 
-export interface AggregrateOptionsInterface {
+export interface AggregateOptionsInterface {
   session: unknown;
 }
 
@@ -103,7 +114,7 @@ export interface IDatabaseAdapter {
   delete(id: string, options?: DeleteOptionsInterface): Promise<DeleteResultInterface>;
   deleteMany(id: string, options?: DeleteOptionsInterface): Promise<unknown>;
   deleteAll(options?: DeleteOptionsInterface): Promise<unknown>;
-  aggregate(pipeline: any, query: any, options?: AggregrateOptionsInterface): Promise<unknown>;
+  aggregate(pipeline: any, query: any, options?: AggregateOptionsInterface): Promise<unknown>;
 }
 
 export default class DatabaseConnection {

@@ -16,7 +16,7 @@ export class SigninUserService {
       filter: { username: username },
       page: 1,
       pageSize: 1,
-      sort: "",
+      sort: {},
     };
 
     const userRepository = new UserRepository(this.db);

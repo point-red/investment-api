@@ -12,10 +12,8 @@ export class ReadUserByEmailService {
       filter: { email: email },
       page: 1,
       pageSize: 1,
-      sort: "",
+      sort: {},
     };
-
-    console.log(query);
 
     const userRepository = new UserRepository(this.db);
     const result = await userRepository.readMany(query);
