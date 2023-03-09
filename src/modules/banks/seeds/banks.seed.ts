@@ -8,7 +8,7 @@ const result = await userRepository.readMany({
   filter: {},
   page: 1,
   pageSize: 1,
-  sort: "",
+  sort: {},
 });
 
 const users = result.data as unknown as Array<UserInterface>;

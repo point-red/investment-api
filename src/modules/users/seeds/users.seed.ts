@@ -9,7 +9,7 @@ const result = await roleRepository.readMany({
   filter: {},
   page: 1,
   pageSize: 1,
-  sort: "",
+  sort: {},
 });
 
 const roles = result.data as unknown as Array<RoleInterface>;

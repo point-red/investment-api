@@ -233,8 +233,16 @@ export default class MongoDbConnection implements IDatabaseAdapter {
       .limit(limit(query.pageSize))
       .skip(skip(page(query.page), limit(query.pageSize)));
 
-    if (sort(query.sort)) {
-      cursor.sort(sort(query.sort));
+    let querySort: string[] = [];
+    if(query.sort) {
+      for(const key in query.sort) {
+        querySort.push(`${query.sort[key] === 'desc' ? '-' : ''}${key}`);
+      }  
+    }
+
+    const sortBy = querySort.join(",");
+    if (sort(sortBy)) {
+      cursor.sort(sort(sortBy));
     }
 
     if (fields(query.fields, query.restrictedFields)) {

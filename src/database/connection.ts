@@ -16,6 +16,11 @@ export interface SearchInterface {
   [key: string]: any;
 }
 
+export interface SortInterface {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 export interface QueryInterface {
   fields: string;
   restrictedFields?: string[];
@@ -23,7 +28,7 @@ export interface QueryInterface {
   filter: FilterInterface;
   page: number;
   pageSize: number;
-  sort: string;
+  sort: SortInterface;
 }
 
 export interface CreateOptionsInterface {

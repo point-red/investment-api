@@ -15,7 +15,7 @@ async function password(req: RequestWithUser, res: Response, next: NextFunction)
       filter: { username: req?.user?.username },
       page: 1,
       pageSize: 1,
-      sort: "",
+      sort: {},
     };
 
     const userRepository = new UserRepository(db);

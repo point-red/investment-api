@@ -12,7 +12,7 @@ export class ReadUserByEmailService {
       filter: { email: email },
       page: 1,
       pageSize: 1,
-      sort: "",
+      sort: {},
     };
 
     console.log(query);
