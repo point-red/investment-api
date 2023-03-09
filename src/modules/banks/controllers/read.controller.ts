@@ -8,7 +8,6 @@ export const read = async (req: Request, res: Response, next: NextFunction) => {
     const readBankService = new ReadBankService(db);
     const result = (await readBankService.handle(req.params.id)) as BankInterface;
 
-    console.log(result);
     res.status(200).json({
       _id: result._id,
       name: result.name,

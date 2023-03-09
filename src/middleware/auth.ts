@@ -34,8 +34,6 @@ async function auth(req: RequestWithUser, res: Response, next: NextFunction) {
     if(role) {
       user.permissions = role.permissions
     }
-
-    console.log(user);
      
     req.user = user;
  

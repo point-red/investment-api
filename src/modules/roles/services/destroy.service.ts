@@ -10,7 +10,6 @@ export class DestroyRoleService {
   public async handle(id: string, options: DeleteOptionsInterface) {
     const roleRepository = new RoleRepository(this.db);
     const response = await roleRepository.delete(id, options);
-    console.log(response);
     return;
   }
 }

@@ -62,7 +62,7 @@ export async function createCollection(db: IDatabaseAdapter) {
     });
     await db.createIndex(
       name,
-      { name: -1, code: -1 },
+      { name: -1, code: -1, branch: -1 },
       {
         unique: true,
         collation: {
