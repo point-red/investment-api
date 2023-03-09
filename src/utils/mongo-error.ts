@@ -13,17 +13,15 @@ export default class MongoError extends BaseError {
         error.errors = obj;
       });
     } else if (err.code === 11000) {
-      error.errors = {} as any;
+      const errors: any = {};
 
       const fields = Object.keys(err.keyPattern);
        
       for (const field of fields) {
-        const obj: any = {};
-        obj[field] = `The ${field} is exists.`;
-        error.errors = obj;
+        errors[field] = `The ${field} is exists.`;
       }
 
-      throw new ApiError(422, error.errors);
+      throw new ApiError(422, errors);
     }
     super(error);
   }
