@@ -2,21 +2,28 @@ export const rolesSeed = [
   {
     name: "super admin",
     permissions: [
-      "menu-user",
-      "create-user",
-      "read-user",
-      "update-user",
-      "delete-user",
-      "menu-role",
-      "create-role",
-      "read-role",
-      "update-role",
-      "delete-role",
-      "menu-item",
-      "create-item",
-      "read-item",
-      "update-item",
-      "delete-item",
+      "bank.view",
+      "bank.create",
+      "bank.update",
+      "bank.delete",
+      "owner.view",
+      "owner.create",
+      "owner.update",
+      "owner.delete",
+      "role.view",
+      "role.create",
+      "role.update",
+      "role.delete",
+      "user.view",
+      "user.create",
+      "user.update",
+      "user.delete"
+    ],
+  },
+  {
+    name: "user",
+    permissions: [
+      
     ],
   },
 ];

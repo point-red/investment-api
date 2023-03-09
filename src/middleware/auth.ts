@@ -1,9 +1,12 @@
-
+import { RoleInterface } from '@src/modules/roles/entities/role.entity.js';
+import { ReadRoleService } from './../modules/roles/services/read.service.js';
+import { ReadUserService } from '@src/modules/users/services/read.service.js';
+import { secretKey } from "@src/config/auth.js";
 import { Response, NextFunction } from 'express';
 import { ApiError } from '@point-hub/express-error-handler';
 import { db } from "@src/database/database.js";
-import { VerifyTokenUserService } from '@src/modules/auth/services/verify-token.service.js';
 import RequestWithUser from '@src/interfaces/RequestWithUser';
+import { verifyToken } from "@src/utils/jwt.js";
 
 async function auth(req: RequestWithUser, res: Response, next: NextFunction) {
   try {
@@ -13,14 +16,28 @@ async function auth(req: RequestWithUser, res: Response, next: NextFunction) {
       throw new ApiError(401);
     }
 
-    const verifyTokenUserService = new VerifyTokenUserService(db);
-    const result = await verifyTokenUserService.handle(authorizationHeader);
+    const authorization: any = verifyToken(authorizationHeader.split(" ")[1], secretKey);
 
-    if(!result) {
+    const readUserService = new ReadUserService(db);
+
+    const user = await readUserService.handle(authorization.sub, {
+      restrictedFields: ["password"],
+    });
+
+    if(!user) {
       throw new ApiError(401);
     }
 
-    req.user = result;
+    const readRoleService = new ReadRoleService(db);
+    const role = (await readRoleService.handle(user.role_id)) as RoleInterface;
+    
+    if(role) {
+      user.permissions = role.permissions
+    }
+
+    console.log(user);
+     
+    req.user = user;
  
     next();
   } catch (error) {
