@@ -21,7 +21,7 @@ export const readMany = async (req: Request, res: Response, next: NextFunction) 
     const readManyBankService = new ReadManyBankService(db);
 
     const iQuery: QueryInterface = {
-      fields: (req.query.field as string) ?? "",
+      fields: "code,name,address,branch,phone,fax,notes,accounts,createdBy_id,createdAt",
       filter: (req.query.filter as any) ?? {},
       search: (req.query.search as any) ?? {},
       page: Number(req.query.page ?? 1),

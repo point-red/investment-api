@@ -35,5 +35,6 @@ export const banksSeed = [
         }
     ],
     createdBy_id: users[0]._id,
+    createdAt: new Date()
 }
 ];

@@ -17,5 +17,6 @@ export const ownersSeed = [
   {
     name: "John Doe",
     createdBy_id: users[0]._id,
+    createdAt: new Date()
   },
 ];
