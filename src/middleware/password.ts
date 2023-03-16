@@ -1,11 +1,11 @@
 
 import { Response, NextFunction } from 'express';
 import { ApiError } from '@point-hub/express-error-handler';
-import { db } from "@src/database/database.js";
-import { verify } from "@src/utils/hash.js";
-import RequestWithUser from '@src/interfaces/RequestWithUser';
-import { QueryInterface } from '@src/database/connection.js';
-import { UserRepository } from '@src/modules/auth/repositories/user.repository.js';
+import { db } from "../database/database.js";
+import { verify } from "../utils/hash.js";
+import RequestWithUser from '../interfaces/RequestWithUser';
+import { QueryInterface } from '../database/connection.js';
+import { UserRepository } from '../modules/auth/repositories/user.repository.js';
 
 async function password(req: RequestWithUser, res: Response, next: NextFunction) {
   try {

@@ -1,7 +1,7 @@
 import { ApiError } from '@point-hub/express-error-handler';
 
 import { Response, NextFunction } from 'express';
-import RequestWithUser from '@src/interfaces/RequestWithUser';
+import RequestWithUser from '../interfaces/RequestWithUser';
 
 const permissions = (...allowedPermissions: string[]) => {
   return (req: RequestWithUser, _: Response, next: NextFunction) => {
