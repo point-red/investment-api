@@ -1,12 +1,12 @@
 import { RoleInterface } from './../modules/roles/entities/role.entity.js';
 import { ReadRoleService } from './../modules/roles/services/read.service.js';
 import { ReadUserService } from './../modules/users/services/read.service.js';
-import { secretKey } from "@src/config/auth.js";
+import { secretKey } from "../config/auth.js";
 import { Response, NextFunction } from 'express';
 import { ApiError } from '@point-hub/express-error-handler';
-import { db } from "@src/database/database.js";
-import RequestWithUser from '@src/interfaces/RequestWithUser';
-import { verifyToken } from "@src/utils/jwt.js";
+import { db } from "../database/database.js";
+import RequestWithUser from '../interfaces/RequestWithUser';
+import { verifyToken } from "../utils/jwt.js";
  
 async function auth(req: RequestWithUser, res: Response, next: NextFunction) {
   try {
