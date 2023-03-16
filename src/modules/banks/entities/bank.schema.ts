@@ -71,14 +71,6 @@ export async function createCollection(db: IDatabaseAdapter) {
         },
       }
     );
-
-    await db.createIndex(
-      name,
-      { "accounts.number": -1  },
-      {
-        unique: true,
-      }
-    );
   } catch (error) {
     throw error;
   }
