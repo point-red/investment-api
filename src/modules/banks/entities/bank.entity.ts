@@ -6,12 +6,12 @@ export interface BankInterface extends CreateBankInterface {
   createdBy_id?: string | ObjectId;
   updatedAt?: Date;
   updatedBy_id?: string | ObjectId;
-  archivedAt?: string | Date;
-  archivedBy_id?: string | ObjectId;
-  requestApprovalDeleteTo_id?: string | ObjectId;
-  requestApprovalDeleteAt?: Date;
-  requestApprovalDeleteReason?: string;
-  requestApprovalDeleteReasonReject?: string;
+  archivedAt?: string | Date | null;
+  archivedBy_id?: string | ObjectId | null;
+  requestApprovalDeleteTo_id?: string | ObjectId | null;
+  requestApprovalDeleteAt?: Date | null;
+  requestApprovalDeleteReason?: string | null;
+  requestApprovalDeleteReasonReject?: string | null;
   requestApprovalDeleteStatus?: "pending" | "approved" | "rejected";
 }
 

@@ -9,8 +9,8 @@ export class RestoreBankService {
   }
   public async handle(id: string, session: unknown) {
     const bankEntity = new BankEntity({
-      archivedAt: "",
-      archivedBy_id: ""
+      archivedAt: null,
+      archivedBy_id: null
     });
 
     const bankRepository = new BankRepository(this.db);

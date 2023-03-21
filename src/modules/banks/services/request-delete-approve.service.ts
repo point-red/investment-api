@@ -9,7 +9,7 @@ export class RequestDeleteApproveBankService {
   }
   public async handle(id: string, session: unknown) {
     const bankEntity = new BankEntity({
-      requestApprovalDeleteReasonReject: "",
+      requestApprovalDeleteReasonReject: null,
       requestApprovalDeleteStatus: "approved"
     });
 

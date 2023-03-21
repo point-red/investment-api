@@ -197,6 +197,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
       throw new Error("Collection not found");
     }
 
+    if(!ObjectId.isValid(id)) {
+      throw new ApiError(404);
+    }
+
     const readOptions = options as FindOptions;
     const result = await this._collection.findOne(
       {
@@ -229,6 +233,7 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     const readOptions = options as FindOptions;
     const cursor = this._collection
       .find({ ...query.filter, ...search }, readOptions)
+      .collation({'locale':'en'})
       .limit(limit(query.pageSize))
       .skip(skip(page(query.page), limit(query.pageSize)));
 
@@ -248,9 +253,9 @@ export default class MongoDbConnection implements IDatabaseAdapter {
       cursor.project(fields(query.fields, query.restrictedFields));
     }
 
-    const result = await cursor.toArray();
+    const result = await cursor.toArray(); 
 
-    const totalDocument = await this._collection.countDocuments(query.filter ?? {}, readOptions);
+    const totalDocument = await this._collection.countDocuments({ ...query.filter, ...search }, readOptions);
 
     return {
       data: result as Array<ReadResultInterface>,

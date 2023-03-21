@@ -29,6 +29,10 @@ export const readMany = async (req: Request, res: Response, next: NextFunction) 
       sort: (req.query.sort as any) ?? {},
     };
 
+    const costumeFilter = { $or: [{ archivedBy_id: { $exists: false } }, { archivedBy_id: { $exists: true, $type: 'null' } }] };
+
+    iQuery.filter = { ...iQuery.filter, ...costumeFilter };
+
     const result = await readManyOwnerService.handle(iQuery);
 
     const pagination: PaginationInterface = {

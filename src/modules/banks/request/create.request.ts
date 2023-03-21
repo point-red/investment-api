@@ -21,6 +21,7 @@ export const validate = (body: any) => {
     code: "required",
     notes: "required",
     accounts: "required|array|unique:number",
+    "accounts.*.name": "required",
     "accounts.*.number": "required|numeric" 
   });
  

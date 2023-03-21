@@ -9,7 +9,7 @@ export class RequestDeleteApproveOwnerService {
   }
   public async handle(id: string, session: unknown) {
     const ownerEntity = new OwnerEntity({
-      requestApprovalDeleteReasonReject: "",
+      requestApprovalDeleteReasonReject: null,
       requestApprovalDeleteStatus: "approved"
     });
 

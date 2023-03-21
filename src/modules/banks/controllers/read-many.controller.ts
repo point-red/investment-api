@@ -28,6 +28,9 @@ export const readMany = async (req: Request, res: Response, next: NextFunction) 
       pageSize: Number(req.query.pageSize ?? 10),
       sort: (req.query.sort as any) ?? {},
     };
+    const costumeFilter = { $or: [{ archivedBy_id: { $exists: false } }, { archivedBy_id: { $exists: true, $type: 'null' } }] };
+
+    iQuery.filter = { ...iQuery.filter, ...costumeFilter };
 
     const result = await readManyBankService.handle(iQuery);
 

@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { OwnerEntity } from "../entities/owner.entity.js";
 import { OwnerRepository } from "../repositories/owner.repository.js";
 import DatabaseConnection, { DocumentInterface } from "@src/database/connection.js";
@@ -9,7 +10,7 @@ export class ArchiveOwnerService {
   }
   public async handle(id: string, doc: DocumentInterface, session: unknown) {
     const ownerEntity = new OwnerEntity({
-      archivedBy_id: doc.archivedBy_id,
+      archivedBy_id: new ObjectId(doc.archivedBy_id),
       archivedAt: new Date(),
     });
 
