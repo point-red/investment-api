@@ -8,7 +8,7 @@
   "scripts": {
     "dev:compile": "tsc -w --project tsconfig.build.json",
     "dev:resolve-path": "tsc-alias -w --project tsconfig.build.json",
-    "dev:run": "nodemon build/index.js",
+    "dev:run": "nodemon --delay 500ms build/index.js",
     "dev": "rimraf build && tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json && concurrently -k npm:dev:*",
     "build:compile": "tsc --project tsconfig.build.json",
     "build:resolve-path": "tsc-alias --project tsconfig.build.json",

@@ -35,7 +35,7 @@ import {
   ReadManyOptionsInterface,
   UpdateOptionsInterface,
   DeleteOptionsInterface,
-  AggregrateOptionsInterface,
+  AggregateOptionsInterface,
 } from "./connection.js";
 import { fields, limit, page, skip, sort } from "./mongodb-util.js";
 import MongoError from "@src/utils/mongo-error.js";
@@ -185,7 +185,6 @@ export default class MongoDbConnection implements IDatabaseAdapter {
         _id: "response.insertedId.toString()",
       };
     } catch (error) {
-      console.log(error);
       if (error instanceof MongoServerError) {
         throw new MongoError(error);
       }
@@ -196,6 +195,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
   public async read(id: string, options?: ReadOptionsInterface): Promise<ReadResultInterface> {
     if (!this._collection) {
       throw new Error("Collection not found");
+    }
+
+    if(!ObjectId.isValid(id)) {
+      throw new ApiError(404);
     }
 
     const readOptions = options as FindOptions;
@@ -220,23 +223,39 @@ export default class MongoDbConnection implements IDatabaseAdapter {
       throw new Error("Collection not found");
     }
 
+    let search = {};
+    if(query.search) {
+      for(const key in query.search) {
+        search = { ...search, [key]: { $regex: query.search[key], $options: 'i'} }
+      }  
+    }
+
     const readOptions = options as FindOptions;
     const cursor = this._collection
-      .find(query.filter ?? {}, readOptions)
+      .find({ ...query.filter, ...search }, readOptions)
+      .collation({'locale':'en'})
       .limit(limit(query.pageSize))
       .skip(skip(page(query.page), limit(query.pageSize)));
 
-    if (sort(query.sort)) {
-      cursor.sort(sort(query.sort));
+    let querySort: string[] = [];
+    if(query.sort) {
+      for(const key in query.sort) {
+        querySort.push(`${query.sort[key] === 'desc' ? '-' : ''}${key}`);
+      }  
+    }
+
+    const sortBy = querySort.join(",");
+    if (sort(sortBy)) {
+      cursor.sort(sort(sortBy));
     }
 
     if (fields(query.fields, query.restrictedFields)) {
       cursor.project(fields(query.fields, query.restrictedFields));
     }
 
-    const result = await cursor.toArray();
+    const result = await cursor.toArray(); 
 
-    const totalDocument = await this._collection.countDocuments(query.filter ?? {}, readOptions);
+    const totalDocument = await this._collection.countDocuments({ ...query.filter, ...search }, readOptions);
 
     return {
       data: result as Array<ReadResultInterface>,
@@ -336,7 +355,7 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     };
   }
 
-  public async aggregate(pipeline: any, query: any, options?: AggregrateOptionsInterface): Promise<unknown> {
+  public async aggregate(pipeline: any, query: any, options?: AggregateOptionsInterface): Promise<unknown> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }

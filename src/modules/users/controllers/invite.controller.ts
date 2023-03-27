@@ -30,10 +30,9 @@ export const invite = async (req: Request, res: Response, next: NextFunction) =>
     await db.commitTransaction();
 
     res.status(201).json({
-      _id: "result._id",
+      _id: result._id
     });
   } catch (error) {
-    console.log("error,", error);
     await db.abortTransaction();
     next(error);
   } finally {
