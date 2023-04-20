@@ -42,4 +42,8 @@ export class UserRepository extends BaseRepository {
   public async delete(id: string, options?: DeleteOptionsInterface): Promise<DeleteResultInterface> {
     return await this.collection().delete(id, options);
   }
+
+  public async aggregate(pipeline: any, query: any) {
+    return await this.collection().aggregate(pipeline, query);
+  }
 }

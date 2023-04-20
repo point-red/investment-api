@@ -1,5 +1,6 @@
 import { ApiError } from "@point-hub/express-error-handler";
 import { UserRepository } from "../repositories/user.repository.js";
+import { ReadUserService } from "./read.service.js";
 import { issuer, secretKey } from "@src/config/auth.js";
 import DatabaseConnection, { QueryInterface } from "@src/database/connection.js";
 import { verify } from "@src/utils/hash.js";
@@ -33,12 +34,14 @@ export class SigninUserService {
 
     const accessToken = signNewToken(issuer, secretKey, result.data[0]._id);
     const refreshToken = generateRefreshToken(issuer, secretKey, result.data[0]._id);
+    const userService = new ReadUserService(this.db);
+    const user = (await userService.handle(result.data[0]._id)) as any;
 
     return {
       name: result.data[0].name,
       email: result.data[0].email,
       username: result.data[0].username,
-      role: result.data[0].role,
+      role: user.role,
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
