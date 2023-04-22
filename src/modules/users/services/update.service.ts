@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { UserEntity } from "../entities/user.entity.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import DatabaseConnection, { DocumentInterface } from "@src/database/connection.js";
@@ -10,10 +11,12 @@ export class UpdateUserService {
   public async handle(id: string, doc: DocumentInterface, session: unknown) {
     const userEntity = new UserEntity({
       username: doc.username,
-      password: doc.password,
+      // password: doc.password,
       email: doc.email,
       name: doc.name,
-      role: doc.role,
+      lastname: doc.lastname,
+      mobilephone: doc.mobilephone,
+      role_id: new ObjectId(doc.role_id),
     });
 
     const userRepository = new UserRepository(this.db);

@@ -23,12 +23,19 @@ export const readMany = async (req: Request, res: Response, next: NextFunction) 
     const iQuery: QueryInterface = {
       fields: (req.query.field as string) ?? "code,name,address,branch,phone,fax,notes,accounts,createdBy_id,createdAt",
       filter: (req.query.filter as any) ?? {},
+      archived: (req.query.archived as unknown as boolean) ?? false,
       search: (req.query.search as any) ?? {},
       page: Number(req.query.page ?? 1),
       pageSize: Number(req.query.pageSize ?? 10),
       sort: (req.query.sort as any) ?? {},
     };
-    const costumeFilter = { $or: [{ archivedBy_id: { $exists: false } }, { archivedBy_id: { $exists: true, $type: 'null' } }] };
+
+    let costumeFilter = {};
+    if (iQuery.archived) {
+      costumeFilter = { archivedBy_id: { $exists: true } };
+    } else {
+      costumeFilter = { archivedBy_id: { $exists: false } };
+    }
 
     iQuery.filter = { ...iQuery.filter, ...costumeFilter };
 

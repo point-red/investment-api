@@ -3,9 +3,12 @@ import Validatorjs from "validatorjs";
 
 export const validate = (body: any) => {
   const validation = new Validatorjs(body, {
+    username: "required",
     name: "required",
+    lastname: "required",
+    mobilephone: "required",
     email: "required|email",
-    role: "required",
+    role_id: "required",
   });
 
   if (validation.fails()) {

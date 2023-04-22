@@ -18,12 +18,15 @@ export class InviteUserService {
   }
   public async handle(doc: DocumentInterface, options?: CreateOptionsInterface) {
     const userEntity = new UserEntity({
+      username: doc.username,
       email: doc.email,
       name: doc.name,
-      role: doc.role,
+      lastname: doc.lastname,
+      mobilephone: doc.mobilephone,
+      role_id: new ObjectId(doc.role_id),
     });
 
-    await userEntity.generateRandomUsername();
+    // await userEntity.generateRandomUsername();
     await userEntity.generateRandomPassword();
     userEntity.generateEmailValidationCode();
 

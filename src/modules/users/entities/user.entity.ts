@@ -7,7 +7,10 @@ export interface UserInterface {
   email?: string;
   password?: string;
   name?: string;
+  lastname?: string;
+  mobilephone?: string;
   role?: string;
+  role_id?: string | ObjectId;
   emailValidationCode?: string;
   status?: "registered" | "activated" | "suspended";
   googleDriveId?: string;
@@ -17,10 +20,23 @@ export interface UserInterface {
   oauthVerification?: {
     google?: string;
   };
-  permissions?: string[]
+  permissions?: string[];
 }
 
 export const restricted = ["password"];
+
+export const hasOne: any = {
+  role: {
+    from: "roles",
+    localField: "role_id",
+    foreignField: "_id",
+    as: "role",
+  },
+};
+
+export const addFields: any = {
+  role: { $arrayElemAt: ["$role", 0] },
+};
 
 export class UserEntity {
   public user: UserInterface;
