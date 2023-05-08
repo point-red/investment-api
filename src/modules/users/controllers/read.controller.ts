@@ -8,6 +8,7 @@ export const read = async (req: Request, res: Response, next: NextFunction) => {
 
     const result = await readUserService.handle(req.params.id, {
       restrictedFields: ["password"],
+      includes: (req.query.includes as string) ?? "",
     });
 
     res.status(200).json(result);

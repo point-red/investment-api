@@ -24,6 +24,8 @@ export interface SortInterface {
 export interface QueryInterface {
   fields: string;
   restrictedFields?: string[];
+  includes?: string;
+  archived?: boolean;
   search?: SearchInterface;
   filter: FilterInterface;
   page: number;
