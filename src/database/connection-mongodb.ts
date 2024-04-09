@@ -84,7 +84,9 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     return this;
   }
 
-  public async listCollections(): Promise<(CollectionInfo | Pick<CollectionInfo, "name" | "type">)[]> {
+  public async listCollections(): Promise<
+    (CollectionInfo | Pick<CollectionInfo, "name" | "type">)[]
+  > {
     if (!this._database) {
       throw new Error("Database not found");
     }
@@ -101,7 +103,11 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     return this;
   }
 
-  public async createIndex(name: string, spec: IndexSpecification, options: CreateIndexesOptions): Promise<any> {
+  public async createIndex(
+    name: string,
+    spec: IndexSpecification,
+    options: CreateIndexesOptions
+  ): Promise<any> {
     if (!this._database) {
       throw new Error("Database not found");
     }
@@ -123,7 +129,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     });
   }
 
-  public async createCollection(name: string, options: CreateCollectionOptions): Promise<any> {
+  public async createCollection(
+    name: string,
+    options: CreateCollectionOptions
+  ): Promise<any> {
     if (!this._database) {
       throw new Error("Database not found");
     }
@@ -131,7 +140,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     await this._database.createCollection(name, options);
   }
 
-  public async dropCollection(name: string, options: DropCollectionOptions): Promise<any> {
+  public async dropCollection(
+    name: string,
+    options: DropCollectionOptions
+  ): Promise<any> {
     if (!this._database) {
       throw new Error("Database not found");
     }
@@ -139,7 +151,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     await this._database.dropCollection(name, options);
   }
 
-  public async create(doc: DocumentInterface, options?: CreateOptionsInterface): Promise<CreateResultInterface> {
+  public async create(
+    doc: DocumentInterface,
+    options?: CreateOptionsInterface
+  ): Promise<CreateResultInterface> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }
@@ -167,7 +182,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     }
   }
 
-  public async createMany(docs: DocumentInterface[], options?: CreateOptionsInterface): Promise<CreateResultInterface> {
+  public async createMany(
+    docs: DocumentInterface[],
+    options?: CreateOptionsInterface
+  ): Promise<CreateResultInterface> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }
@@ -178,7 +196,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
       // inject date of created
       // doc.createdAt = new Date();
 
-      const response = await this._collection.insertMany(docs, insertOneOptions);
+      const response = await this._collection.insertMany(
+        docs,
+        insertOneOptions
+      );
 
       return {
         acknowledged: response.acknowledged,
@@ -192,12 +213,15 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     }
   }
 
-  public async read(id: string, options?: ReadOptionsInterface): Promise<ReadResultInterface> {
+  public async read(
+    id: string,
+    options?: ReadOptionsInterface
+  ): Promise<ReadResultInterface> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }
 
-    if(!ObjectId.isValid(id)) {
+    if (!ObjectId.isValid(id)) {
       throw new ApiError(404);
     }
 
@@ -218,30 +242,36 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     };
   }
 
-  public async readMany(query: QueryInterface, options?: ReadManyOptionsInterface): Promise<ReadManyResultInterface> {
+  public async readMany(
+    query: QueryInterface,
+    options?: ReadManyOptionsInterface
+  ): Promise<ReadManyResultInterface> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }
 
     let search = {};
-    if(query.search) {
-      for(const key in query.search) {
-        search = { ...search, [key]: { $regex: query.search[key], $options: 'i'} }
-      }  
+    if (query.search) {
+      for (const key in query.search) {
+        search = {
+          ...search,
+          [key]: { $regex: query.search[key], $options: "i" },
+        };
+      }
     }
 
     const readOptions = options as FindOptions;
     const cursor = this._collection
       .find({ ...query.filter, ...search }, readOptions)
-      .collation({'locale':'en'})
+      .collation({ locale: "en" })
       .limit(limit(query.pageSize))
       .skip(skip(page(query.page), limit(query.pageSize)));
 
     let querySort: string[] = [];
-    if(query.sort) {
-      for(const key in query.sort) {
-        querySort.push(`${query.sort[key] === 'desc' ? '-' : ''}${key}`);
-      }  
+    if (query.sort) {
+      for (const key in query.sort) {
+        querySort.push(`${query.sort[key] === "desc" ? "-" : ""}${key}`);
+      }
     }
 
     const sortBy = querySort.join(",");
@@ -253,9 +283,12 @@ export default class MongoDbConnection implements IDatabaseAdapter {
       cursor.project(fields(query.fields, query.restrictedFields));
     }
 
-    const result = await cursor.toArray(); 
+    const result = await cursor.toArray();
 
-    const totalDocument = await this._collection.countDocuments({ ...query.filter, ...search }, readOptions);
+    const totalDocument = await this._collection.countDocuments(
+      { ...query.filter, ...search },
+      readOptions
+    );
 
     return {
       data: result as Array<ReadResultInterface>,
@@ -279,11 +312,22 @@ export default class MongoDbConnection implements IDatabaseAdapter {
 
     const updateOptions = options as UpdateOptions;
 
-    // inject date of updated
-    document.updatedAt = new Date();
-
     try {
-      const result = await this._collection.updateOne({ _id: new ObjectId(id) }, { $set: document }, updateOptions);
+      let result;
+      if (options?.xraw === true) {
+        console.log(id, document);
+        result = await this._collection.updateOne(
+          { _id: new ObjectId(id) },
+          document,
+          updateOptions
+        );
+      } else {
+        result = await this._collection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: document },
+          updateOptions
+        );
+      }
 
       return {
         acknowledged: result.acknowledged,
@@ -300,7 +344,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     }
   }
 
-  public async delete(id: string, options?: DeleteOptionsInterface): Promise<DeleteResultInterface> {
+  public async delete(
+    id: string,
+    options?: DeleteOptionsInterface
+  ): Promise<DeleteResultInterface> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }
@@ -320,7 +367,10 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     };
   }
 
-  public async deleteMany(id: string, options?: DeleteOptionsInterface): Promise<DeleteResultInterface> {
+  public async deleteMany(
+    id: string,
+    options?: DeleteOptionsInterface
+  ): Promise<DeleteResultInterface> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }
@@ -340,7 +390,9 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     };
   }
 
-  public async deleteAll(options?: DeleteOptionsInterface): Promise<DeleteResultInterface> {
+  public async deleteAll(
+    options?: DeleteOptionsInterface
+  ): Promise<DeleteResultInterface> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }
@@ -355,7 +407,11 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     };
   }
 
-  public async aggregate(pipeline: any, query: any, options?: AggregateOptionsInterface): Promise<unknown> {
+  public async aggregate(
+    pipeline: any,
+    query: any,
+    options?: AggregateOptionsInterface
+  ): Promise<unknown> {
     if (!this._collection) {
       throw new Error("Collection not found");
     }
@@ -363,16 +419,25 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     const aggregateOptions = options as AggregateOptions;
 
     const cursor = this._collection.aggregate(
-      [...pipeline, { $skip: (query.page - 1) * query.pageSize }, { $limit: query.pageSize }],
+      [
+        ...pipeline,
+        { $skip: (query.page - 1) * query.pageSize },
+        { $limit: query.pageSize },
+      ],
       aggregateOptions
     );
 
     const result = await cursor.toArray();
 
-    const cursorPagination = this._collection.aggregate([...pipeline, { $count: "totalDocument" }], aggregateOptions);
+    const cursorPagination = this._collection.aggregate(
+      [...pipeline, { $count: "totalDocument" }],
+      aggregateOptions
+    );
     const resultPagination = await cursorPagination.toArray();
 
-    const totalDocument = resultPagination.length ? resultPagination[0].totalDocument : 0;
+    const totalDocument = resultPagination.length
+      ? resultPagination[0].totalDocument
+      : 0;
     return {
       data: result as Array<ReadResultInterface>,
       pagination: {
