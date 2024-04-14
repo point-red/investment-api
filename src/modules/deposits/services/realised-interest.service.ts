@@ -8,7 +8,7 @@ import {
 import { DepositRepository } from "@src/modules/deposits/repositories/deposit.repository.js";
 import { ObjectId } from "mongodb";
 
-export class CreateCashbackService {
+export class RealisedInterestService {
   private db: DatabaseConnection;
   constructor(db: DatabaseConnection) {
     this.db = db;
@@ -20,7 +20,7 @@ export class CreateCashbackService {
       await depositRepository.update(
         id,
         {
-          $pull: { cashbackPayments: { _id: new ObjectId(doc._id) } },
+          $pull: { interestPayments: { _id: new ObjectId(doc._id) } },
         },
         {
           session,
@@ -39,27 +39,29 @@ export class CreateCashbackService {
 
     delete doc.user;
 
-    const cashbacks = [];
+    const interests = [];
     let totalRemaining = 0;
-    for (const cashback of doc.cashbacks) {
+    for (const cashback of doc.interests) {
       totalRemaining += Number(cashback.amount);
     }
-    for (const cashback of doc.cashbacks) {
+    for (const interest of doc.interests) {
       const payments = [];
-      cashback.remaining = Number(cashback.amount);
-      for (const payment of cashback.payments) {
+      interest.remaining = Number(interest.net);
+      for (const payment of interest.payments) {
         payments.push({
+          bank: payment.bank,
+          account: payment.account,
           date: payment.date,
           amount: Number(payment.amount),
-          remaining: Number(cashback.remaining),
+          remaining: Number(interest.remaining),
         });
-        cashback.remaining -= Number(payment.amount);
+        interest.remaining -= Number(payment.amount);
         totalRemaining -= Number(payment.amount);
       }
-      cashback.payments = payments;
-      cashbacks.push(cashback);
+      interest.payments = payments;
+      interests.push(interest);
     }
-    doc.cashbacks = cashbacks;
+    doc.interests = interests;
 
     if (totalRemaining == 0) {
       doc.status = "complete";
@@ -72,7 +74,7 @@ export class CreateCashbackService {
       {
         $set: { formStatus: "pending" },
         $push: {
-          cashbackPayments: doc,
+          interestPayments: doc,
         },
       },
       {

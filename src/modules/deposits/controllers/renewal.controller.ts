@@ -1,19 +1,16 @@
 import { NextFunction, Response } from "express";
+import { validate } from "../request/renewal.request.js";
 import { db } from "@src/database/database.js";
 import RequestWithUser from "@src/interfaces/RequestWithUser.js";
-import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
 import {
   CreateDepositInterface,
-  DepositCashbackInterface,
   DepositInterface,
-  DepositReturnInterface,
 } from "@src/modules/deposits/entities/deposit.entitiy.js";
-import { UpdateDepositService } from "@src/modules/deposits/services/update.service.js";
-import { validate } from "@src/modules/deposits/request/create.request.js";
+import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
 import { CalculateDepositService } from "@src/modules/deposits/services/calculate.service.js";
-import { ObjectId } from "mongodb";
+import { RenewalService } from "@src/modules/deposits/services/renewal.service.js";
 
-export const update = async (
+export const renewal = async (
   req: RequestWithUser,
   res: Response,
   next: NextFunction
@@ -26,22 +23,17 @@ export const update = async (
     validate(req.body);
 
     const readDepositService = new ReadDepositService(db);
-    const deposit = (await readDepositService.handle(
-      req.params.id
-    )) as DepositInterface;
+    (await readDepositService.handle(req.params.id)) as DepositInterface;
 
     const calculate = new CalculateDepositService();
-    const data: CreateDepositInterface = await calculate.calculate(
-      req.body,
-      deposit
-    );
+    const data: CreateDepositInterface = await calculate.calculate(req.body);
+    const renewalService = new RenewalService(db);
 
-    const updateDepositService = new UpdateDepositService(db);
-    await updateDepositService.handle(
+    const result = await renewalService.handle(
       req.params.id,
       {
         ...data,
-        updatedBy: {
+        createdBy: {
           _id: req.user?._id,
           name: req.user?.name,
           username: req.user?.username,
@@ -53,11 +45,9 @@ export const update = async (
     await db.commitTransaction();
 
     const readDeposit = new ReadDepositService(db);
-    const result = (await readDeposit.handle(
-      req.params.id
-    )) as DepositInterface;
-    res.status(200).json({
-      ...result,
+    const deposit = (await readDeposit.handle(result._id)) as DepositInterface;
+    res.status(201).json({
+      ...deposit,
     });
   } catch (error) {
     await db.abortTransaction();

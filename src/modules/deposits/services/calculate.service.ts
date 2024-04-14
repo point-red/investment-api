@@ -15,7 +15,7 @@ export class CalculateDepositService {
       ...body,
     };
 
-    let date = new Date(data.date);
+    let date = new Date(data.date.replace(/(\d+[/])(\d+[/])/, "$2$1"));
     data.date = date.toISOString();
     if (!entity) {
       const readMany = new ReadManyDepositService(db);
@@ -38,26 +38,27 @@ export class CalculateDepositService {
     }
 
     data.remaining = data.amount;
-    data.baseInterest =
-      (data.amount * (data.interestRate / 100)) / data.baseDate;
+    data.baseInterest = Math.floor(
+      (data.amount * (data.interestRate / 100)) / data.baseDate
+    );
     data.dueDate = addDay(date, data.tenor).toISOString();
     data.grossInterest = data.baseInterest * data.tenor;
-    data.taxAmount = data.grossInterest * (data.taxRate / 100);
+    data.taxAmount = Math.floor(data.grossInterest * (data.taxRate / 100));
     data.netInterest = data.grossInterest - data.taxAmount;
 
     let lastDueDate = new Date(data.date);
-    const interests = data.interests.sort((a, b) => a.baseDays - b.baseDays);
-    for (const interest of interests) {
-      lastDueDate = addDay(lastDueDate, interest.baseDays);
-      interest.dueDate = lastDueDate.toISOString();
-      interest.gross = data.baseInterest * interest.baseDays;
-      interest.taxAmount = interest.gross * (data.taxRate / 100);
-      interest.net = interest.gross - interest.taxAmount;
+    const returns = data.returns.sort((a, b) => a.baseDays - b.baseDays);
+    for (const ret of returns) {
+      lastDueDate = addDay(lastDueDate, ret.baseDays);
+      ret.dueDate = lastDueDate.toISOString();
+      ret.gross = data.baseInterest * ret.baseDays;
+      ret.taxAmount = Math.floor(ret.gross * (data.taxRate / 100));
+      ret.net = ret.gross - ret.taxAmount;
     }
 
     if (data.cashbacks) {
       for (const cashback of data.cashbacks) {
-        cashback.amount = data.amount * (cashback.rate / 100);
+        cashback.amount = Math.floor(data.amount * (cashback.rate / 100));
         cashback.remaining = cashback.amount;
       }
     }

@@ -23,13 +23,23 @@ export const createCashback = async (
 
     const createDepositService = new CreateCashbackService(db);
 
-    await createDepositService.handle(req.params.id, req.body, session);
+    await createDepositService.handle(
+      req.params.id,
+      {
+        ...req.body,
+        user: {
+          _id: req.user?._id,
+          name: req.user?.name,
+          username: req.user?.username,
+        },
+      },
+      session
+    );
 
     await db.commitTransaction();
 
     res.status(204).json();
   } catch (error) {
-    console.log(error);
     await db.abortTransaction();
     next(error);
   } finally {

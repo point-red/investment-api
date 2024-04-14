@@ -3,24 +3,28 @@ import DatabaseConnection, {
 } from "@src/database/connection.js";
 import {
   DepositCashbackPaymentInterface,
+  DepositEntity,
   DepositInterface,
 } from "@src/modules/deposits/entities/deposit.entitiy.js";
 import { DepositRepository } from "@src/modules/deposits/repositories/deposit.repository.js";
 import { ObjectId } from "mongodb";
 
-export class CreateCashbackService {
+export class WithdrawalService {
   private db: DatabaseConnection;
   constructor(db: DatabaseConnection) {
     this.db = db;
   }
   public async handle(id: string, doc: DocumentInterface, session: unknown) {
     const depositRepository = new DepositRepository(this.db);
+    const deposit = (await depositRepository.read(
+      id
+    )) as unknown as DepositInterface;
 
     if (doc._id) {
       await depositRepository.update(
         id,
         {
-          $pull: { cashbackPayments: { _id: new ObjectId(doc._id) } },
+          $pull: { withdrawals: { _id: new ObjectId(doc._id) } },
         },
         {
           session,
@@ -39,30 +43,25 @@ export class CreateCashbackService {
 
     delete doc.user;
 
-    const cashbacks = [];
-    let totalRemaining = 0;
-    for (const cashback of doc.cashbacks) {
-      totalRemaining += Number(cashback.amount);
+    const payments = [];
+    let remaining = Number(deposit.amount);
+    for (const payment of doc.payments) {
+      payments.push({
+        bank: payment.bank,
+        account: payment.account,
+        recipientName: payment.recipientName,
+        date: payment.date,
+        amount: Number(payment.amount),
+        remaining: remaining,
+      });
+      remaining -= Number(payment.amount);
     }
-    for (const cashback of doc.cashbacks) {
-      const payments = [];
-      cashback.remaining = Number(cashback.amount);
-      for (const payment of cashback.payments) {
-        payments.push({
-          date: payment.date,
-          amount: Number(payment.amount),
-          remaining: Number(cashback.remaining),
-        });
-        cashback.remaining -= Number(payment.amount);
-        totalRemaining -= Number(payment.amount);
-      }
-      cashback.payments = payments;
-      cashbacks.push(cashback);
-    }
-    doc.cashbacks = cashbacks;
+    doc.payments = payments;
 
-    if (totalRemaining == 0) {
+    let formStatus = "pending";
+    if (remaining == 0) {
       doc.status = "complete";
+      formStatus = "completed";
     } else {
       doc.status = "incomplete";
     }
@@ -70,9 +69,9 @@ export class CreateCashbackService {
     await depositRepository.update(
       id,
       {
-        $set: { formStatus: "pending" },
+        $set: { remaining: remaining, formStatus: formStatus },
         $push: {
-          cashbackPayments: doc,
+          withdrawals: doc,
         },
       },
       {

@@ -3,11 +3,11 @@ import Validatorjs from "validatorjs";
 
 export const validate = (body: any) => {
   const validation = new Validatorjs(body, {
-    cashbacks: "required|array",
-    "cashbacks.*.payments": "required",
-    "cashbacks.*.payments.*.remaining": "required",
-    "cashbacks.*.payments.*.date": "required",
-    "cashbacks.*.payments.*.amount": "required",
+    interests: "required|array",
+    "interests.*.payments": "required",
+    "interests.*.payments.*.remaining": "required",
+    "interests.*.payments.*.date": "required",
+    "interests.*.payments.*.amount": "required",
   });
 
   if (validation.fails()) {

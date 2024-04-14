@@ -1,12 +1,11 @@
 import { NextFunction, Response } from "express";
-import { validate } from "../request/delete.request.js";
 import { db } from "@src/database/database.js";
 import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
 import { DepositInterface } from "@src/modules/deposits/entities/deposit.entitiy.js";
-import { DeleteDepositService } from "@src/modules/deposits/services/delete.service.js";
 import RequestWithUser from "@src/interfaces/RequestWithUser.js";
+import { DeleteCashbackService } from "@src/modules/deposits/services/delete-cashback.service.js";
 
-export const destroy = async (
+export const destroyCashback = async (
   req: RequestWithUser,
   res: Response,
   next: NextFunction
@@ -21,10 +20,11 @@ export const destroy = async (
     const readDepositService = new ReadDepositService(db);
     (await readDepositService.handle(req.params.id)) as DepositInterface;
 
-    const deleteDepositService = new DeleteDepositService(db);
+    const deleteCashbackService = new DeleteCashbackService(db);
 
-    await deleteDepositService.handle(
+    await deleteCashbackService.handle(
       req.params.id,
+      req.params.cashbackId,
       {
         ...req.body,
         deletedBy: {

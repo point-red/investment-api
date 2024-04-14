@@ -21,39 +21,10 @@ Validator.register(
 export const validate = (body: any) => {
   const validation = new Validatorjs(body, {
     date: "required",
-    bilyetNumber: "required",
-    bank: {
-      _id: "string|required",
-      name: "string|required",
-    },
-    account: {
-      number: "required",
-      name: "string|required",
-    },
-    owner: {
-      _id: "string|required",
-      name: "string|required",
-    },
     baseDate: "required",
     tenor: "required",
     isRollOver: "required",
     amount: "required",
-    sourceBank: {
-      _id: "string|required",
-      name: "string|required",
-    },
-    sourceBankAccount: {
-      number: "required",
-      name: "string|required",
-    },
-    recipientBank: {
-      _id: "string|required",
-      name: "string|required",
-    },
-    recipientBankAccount: {
-      number: "required",
-      name: "string|required",
-    },
     paymentMethod: "required",
     interestRate: "required",
     taxRate: "required",

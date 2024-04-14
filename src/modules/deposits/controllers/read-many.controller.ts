@@ -34,6 +34,12 @@ export const readMany = async (
       sort: (req.query.sort as any) ?? {},
     };
 
+    iQuery.filter = {
+      ...iQuery.filter,
+      deletedBy: { $exists: false },
+      "cashbackPayments.deletedBy": { $exists: false },
+    };
+
     const result = await readManyDepositService.handle(iQuery);
 
     const pagination: PaginationInterface = {

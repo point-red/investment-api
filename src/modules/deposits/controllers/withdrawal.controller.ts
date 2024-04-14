@@ -1,12 +1,12 @@
 import { NextFunction, Response } from "express";
-import { validate } from "../request/delete.request.js";
+import { validate } from "../request/withdrawal.request.js";
 import { db } from "@src/database/database.js";
-import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
-import { DepositInterface } from "@src/modules/deposits/entities/deposit.entitiy.js";
-import { DeleteDepositService } from "@src/modules/deposits/services/delete.service.js";
 import RequestWithUser from "@src/interfaces/RequestWithUser.js";
+import { DepositInterface } from "@src/modules/deposits/entities/deposit.entitiy.js";
+import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
+import { WithdrawalService } from "@src/modules/deposits/services/withdrawal.service.js";
 
-export const destroy = async (
+export const withdrawal = async (
   req: RequestWithUser,
   res: Response,
   next: NextFunction
@@ -16,18 +16,18 @@ export const destroy = async (
 
     db.startTransaction();
 
-    // validate(req.body);
+    validate(req.body);
 
     const readDepositService = new ReadDepositService(db);
     (await readDepositService.handle(req.params.id)) as DepositInterface;
 
-    const deleteDepositService = new DeleteDepositService(db);
+    const withdrawalService = new WithdrawalService(db);
 
-    await deleteDepositService.handle(
+    await withdrawalService.handle(
       req.params.id,
       {
         ...req.body,
-        deletedBy: {
+        user: {
           _id: req.user?._id,
           name: req.user?.name,
           username: req.user?.username,

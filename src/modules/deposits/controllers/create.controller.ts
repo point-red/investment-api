@@ -5,10 +5,13 @@ import RequestWithUser from "@src/interfaces/RequestWithUser.js";
 import { CreateDepositService } from "@src/modules/deposits/services/create.service.js";
 import {
   CreateDepositInterface,
+  DepositCashbackInterface,
   DepositInterface,
+  DepositReturnInterface,
 } from "@src/modules/deposits/entities/deposit.entitiy.js";
 import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
 import { CalculateDepositService } from "@src/modules/deposits/services/calculate.service.js";
+import { ObjectId } from "mongodb";
 
 export const create = async (
   req: RequestWithUser,
@@ -46,7 +49,6 @@ export const create = async (
       ...deposit,
     });
   } catch (error) {
-    console.log(error);
     await db.abortTransaction();
     next(error);
   } finally {

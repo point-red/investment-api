@@ -315,7 +315,6 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     try {
       let result;
       if (options?.xraw === true) {
-        console.log(id, document);
         result = await this._collection.updateOne(
           { _id: new ObjectId(id) },
           document,

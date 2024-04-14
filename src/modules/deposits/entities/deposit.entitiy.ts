@@ -4,6 +4,7 @@ import { UserInterface } from "@src/modules/users/entities/user.entity.js";
 
 export interface DepositInterface extends CreateDepositInterface {
   _id?: string | ObjectId;
+  formStatus?: string;
   createdAt?: string;
   createdBy?: UserInterface;
   updatedAt?: string;
@@ -14,6 +15,9 @@ export interface DepositInterface extends CreateDepositInterface {
   deletedAt?: string | null;
   deletedReason?: string | null;
   renewalDeposit_id?: string | ObjectId;
+  cashbackPayments?: any[] | null;
+  interestPayments?: any[] | null;
+  withdrawals?: any[] | null;
 }
 
 export interface DeleteDepositInterface {
@@ -28,6 +32,7 @@ export interface CreateDepositInterface {
   bilyetNumber?: string;
   number?: string;
   bank?: DepositBankInterface;
+  account?: DepositAccountInterface;
   owner?: DepositOwnerInterface;
   baseDate: number;
   tenor: number;
@@ -35,7 +40,9 @@ export interface CreateDepositInterface {
   isRollOver?: boolean;
   amount: number;
   sourceBank?: DepositBankInterface;
+  sourceBankAccount?: DepositAccountInterface;
   recipientBank?: DepositBankInterface;
+  recipientBankAccount?: DepositAccountInterface;
   paymentMethod?: "advance" | "in_arrear";
   interestRate: number;
   baseInterest: number;
@@ -46,17 +53,18 @@ export interface CreateDepositInterface {
   remaining?: number;
   isCashback?: boolean;
   note?: string;
-  interests: DepositInterestInterface[];
+  returns: DepositReturnInterface[];
   cashbacks?: DepositCashbackInterface[];
 }
 
 export interface DepositBankInterface {
   _id: string | ObjectId;
   name: string;
-  account: {
-    number: string;
-    name: string;
-  };
+}
+
+export interface DepositAccountInterface {
+  number: string;
+  name: string;
 }
 
 export interface DepositOwnerInterface {
@@ -64,7 +72,8 @@ export interface DepositOwnerInterface {
   name: string;
 }
 
-export interface DepositInterestInterface {
+export interface DepositReturnInterface {
+  _id?: string | ObjectId;
   baseDays: number;
   dueDate?: string;
   gross?: number;
@@ -73,6 +82,7 @@ export interface DepositInterestInterface {
 }
 
 export interface DepositCashbackInterface {
+  _id?: string | ObjectId;
   rate: number;
   amount?: number;
   remaining?: number;
@@ -83,9 +93,10 @@ export interface DepositCashbackPaymentInterface {
   rate?: number;
   date?: string;
   amount?: number;
+  remaining?: number;
   note?: string;
   createdAt?: string;
-  createdBy_id?: string | ObjectId;
+  createdBy?: UserInterface;
   updatedAt?: string;
   updatedBy_id?: string | ObjectId;
   deletedBy_id?: string | ObjectId | null;

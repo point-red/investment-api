@@ -43,18 +43,18 @@ export async function createCollection(db: IDatabaseAdapter) {
               bsonType: "string",
               description: "bank name from master bank",
             },
-            account: {
-              bsonType: "object",
-              properties: {
-                number: {
-                  bsonType: "string",
-                  description: " account number from the bank account",
-                },
-                name: {
-                  bsonType: "string",
-                  description: " account name for the bank account",
-                },
-              },
+          },
+        },
+        account: {
+          bsonType: "object",
+          properties: {
+            number: {
+              bsonType: "string",
+              description: " account number from the bank account",
+            },
+            name: {
+              bsonType: "string",
+              description: " account name for the bank account",
             },
           },
         },
@@ -106,18 +106,18 @@ export async function createCollection(db: IDatabaseAdapter) {
               bsonType: "string",
               description: "bank name from master bank",
             },
-            account: {
-              bsonType: "object",
-              properties: {
-                number: {
-                  bsonType: "string",
-                  description: " account number from the bank account",
-                },
-                name: {
-                  bsonType: "string",
-                  description: " account name for the bank account",
-                },
-              },
+          },
+        },
+        sourceBankAccount: {
+          bsonType: "object",
+          properties: {
+            number: {
+              bsonType: "string",
+              description: " account number from the bank account",
+            },
+            name: {
+              bsonType: "string",
+              description: " account name for the bank account",
             },
           },
         },
@@ -132,18 +132,18 @@ export async function createCollection(db: IDatabaseAdapter) {
               bsonType: "string",
               description: "bank name from master bank",
             },
-            account: {
-              bsonType: "object",
-              properties: {
-                number: {
-                  bsonType: "string",
-                  description: " account number from the bank account",
-                },
-                name: {
-                  bsonType: "string",
-                  description: " account name for the bank account",
-                },
-              },
+          },
+        },
+        recipientBankAccount: {
+          bsonType: "object",
+          properties: {
+            number: {
+              bsonType: "string",
+              description: " account number from the bank account",
+            },
+            name: {
+              bsonType: "string",
+              description: " account name for the bank account",
             },
           },
         },
@@ -170,13 +170,13 @@ export async function createCollection(db: IDatabaseAdapter) {
         },
         taxAmount: {
           bsonType: "number",
-          description: " deposit tax amount",
+          description: "deposit tax amount",
         },
         netInterest: {
           bsonType: "number",
-          description: " deposit net interest",
+          description: "deposit net interest",
         },
-        interests: {
+        returns: {
           bsonType: "array",
           items: {
             bsonType: "object",
@@ -205,6 +205,10 @@ export async function createCollection(db: IDatabaseAdapter) {
                 bsonType: "number",
                 description: "deposit interest net interest amount",
               },
+              remaining: {
+                bsonType: "number",
+                description: "deposit interest remaining",
+              },
             },
           },
         },
@@ -232,6 +236,55 @@ export async function createCollection(db: IDatabaseAdapter) {
               remaining: {
                 bsonType: "number",
                 description: "deposit cashback remaining",
+              },
+              payments: {
+                bsonType: "array",
+                items: {
+                  bsonType: "object",
+                  properties: {
+                    _id: {
+                      bsonType: "objectId",
+                      description: "The _id for the cashback payments",
+                    },
+                    rate: {
+                      bsonType: "number",
+                      description: "cashback payment rate",
+                    },
+                    date: {
+                      bsonType: "date",
+                      description: "cashback payment date",
+                    },
+                    amount: {
+                      bsonType: "number",
+                      description: "cashback payment amount",
+                    },
+                    note: {
+                      bsonType: "string",
+                      description: "cashback payment note",
+                    },
+                    createdBy: {
+                      bsonType: "object",
+                      properties: {
+                        _id: {
+                          bsonType: "objectId",
+                          description: "The user_id for the users",
+                        },
+                        username: {
+                          bsonType: "string",
+                          description: "The username for the user",
+                        },
+                        name: {
+                          bsonType: "string",
+                          description: "The name for the user",
+                        },
+                      },
+                    },
+                    createdAt: {
+                      bsonType: "date",
+                      description: "date when the deposit was created",
+                    },
+                  },
+                },
               },
             },
           },
@@ -315,55 +368,6 @@ export async function createCollection(db: IDatabaseAdapter) {
         renewalDeposit_id: {
           bsonType: "objectId",
           description: "identifier from parent deposit",
-        },
-        cashbackPayments: {
-          bsonType: "array",
-          items: {
-            bsonType: "object",
-            properties: {
-              _id: {
-                bsonType: "objectId",
-                description: "The _id for the cashback payments",
-              },
-              rate: {
-                bsonType: "number",
-                description: "cashback payment rate",
-              },
-              date: {
-                bsonType: "date",
-                description: "cashback payment date",
-              },
-              amount: {
-                bsonType: "number",
-                description: "cashback payment amount",
-              },
-              note: {
-                bsonType: "string",
-                description: "cashback payment note",
-              },
-              createdBy: {
-                bsonType: "object",
-                properties: {
-                  _id: {
-                    bsonType: "objectId",
-                    description: "The user_id for the users",
-                  },
-                  username: {
-                    bsonType: "string",
-                    description: "The username for the user",
-                  },
-                  name: {
-                    bsonType: "string",
-                    description: "The name for the user",
-                  },
-                },
-              },
-              createdAt: {
-                bsonType: "date",
-                description: "date when the deposit was created",
-              },
-            },
-          },
         },
         interestPayments: {
           bsonType: "array",
