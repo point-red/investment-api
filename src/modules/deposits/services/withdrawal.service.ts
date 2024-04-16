@@ -57,19 +57,10 @@ export class WithdrawalService {
       remaining -= Number(payment.amount);
     }
     doc.payments = payments;
-
-    let formStatus = "pending";
-    if (remaining == 0) {
-      doc.status = "complete";
-      formStatus = "completed";
-    } else {
-      doc.status = "incomplete";
-    }
-
     await depositRepository.update(
       id,
       {
-        $set: { remaining: remaining, formStatus: formStatus },
+        $set: { remaining: remaining },
         $push: {
           withdrawals: doc,
         },

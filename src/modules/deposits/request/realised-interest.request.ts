@@ -4,10 +4,9 @@ import Validatorjs from "validatorjs";
 export const validate = (body: any) => {
   const validation = new Validatorjs(body, {
     interests: "required|array",
-    "interests.*.payments": "required",
-    "interests.*.payments.*.remaining": "required",
-    "interests.*.payments.*.date": "required",
-    "interests.*.payments.*.amount": "required",
+    "interests.*.net": "required",
+    "interests.*.date": "required",
+    "interests.*.received": "required",
   });
 
   if (validation.fails()) {

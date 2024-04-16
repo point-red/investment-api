@@ -1,8 +1,13 @@
 import DatabaseConnection, {
   DocumentInterface,
 } from "@src/database/connection.js";
-import { DepositEntity } from "@src/modules/deposits/entities/deposit.entitiy.js";
+import {
+  DepositEntity,
+  DepositInterface,
+} from "@src/modules/deposits/entities/deposit.entitiy.js";
 import { DepositRepository } from "@src/modules/deposits/repositories/deposit.repository.js";
+import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
+import { DeleteDepositService } from "@src/modules/deposits/services/delete.service.js";
 
 export class UpdateDepositService {
   private db: DatabaseConnection;
@@ -57,9 +62,27 @@ export class UpdateDepositService {
       netInterest: doc.netInterest,
       isCashback: doc.isCashback,
       cashbacks: doc.cashbacks,
+      formStatus: doc.formStatus,
       note: doc.note,
       updatedBy: doc.updatedBy,
+      cashbackPayments: [],
+      interestPayments: [],
+      withdrawals: [],
     });
+
+    const readDepositService = new ReadDepositService(this.db);
+    const deposit = (await readDepositService.handle(id)) as DepositInterface;
+    if (deposit.renewal_id) {
+      const deleteDepositService = new DeleteDepositService(this.db);
+
+      await deleteDepositService.handle(
+        deposit.renewal_id as string,
+        {
+          deletedBy: doc.updatedBy,
+        },
+        session
+      );
+    }
 
     const depositRepository = new DepositRepository(this.db);
     return await depositRepository.update(id, depositEntity.deposit, {

@@ -15,8 +15,10 @@ export class CalculateDepositService {
       ...body,
     };
 
-    let date = new Date(data.date.replace(/(\d+[/])(\d+[/])/, "$2$1"));
-    data.date = date.toISOString();
+    let date = new Date(
+      data.date.replace(/(\d+[/])(\d+[/])/, "$2$1")
+    ).toISOString();
+    data.date = date;
     if (!entity) {
       const readMany = new ReadManyDepositService(db);
       const iQuery: QueryInterface = {
@@ -47,13 +49,29 @@ export class CalculateDepositService {
     data.netInterest = data.grossInterest - data.taxAmount;
 
     let lastDueDate = new Date(data.date);
-    const returns = data.returns.sort((a, b) => a.baseDays - b.baseDays);
-    for (const ret of returns) {
-      lastDueDate = addDay(lastDueDate, ret.baseDays);
-      ret.dueDate = lastDueDate.toISOString();
-      ret.gross = data.baseInterest * ret.baseDays;
-      ret.taxAmount = Math.floor(ret.gross * (data.taxRate / 100));
-      ret.net = ret.gross - ret.taxAmount;
+    let totalReturn = 0;
+
+    data.formStatus = "complete";
+    if (data.returns) {
+      const returns = data.returns.sort((a, b) => a.baseDays - b.baseDays);
+      for (const ret of returns) {
+        lastDueDate = addDay(lastDueDate.toISOString(), ret.baseDays);
+        ret.dueDate = lastDueDate.toISOString();
+        ret.gross = data.baseInterest * ret.baseDays;
+        ret.taxAmount = Math.floor(ret.gross * (data.taxRate / 100));
+        ret.net = ret.gross - ret.taxAmount;
+        totalReturn += Number(ret.net);
+      }
+
+      if (totalReturn != data.netInterest) {
+        data.formStatus = "draft";
+      }
+    }
+
+    if (data.isRollOver) {
+      if (!data.returns || data.returns.length == 0) {
+        data.formStatus = "draft";
+      }
     }
 
     if (data.cashbacks) {
@@ -62,6 +80,14 @@ export class CalculateDepositService {
         cashback.remaining = cashback.amount;
       }
     }
+
+    if (data.isCashback) {
+      if (!data.cashbacks || data.cashbacks.length == 0) {
+        data.formStatus = "draft";
+      }
+    }
+
+    console.log(data.formStatus);
 
     return data;
   }

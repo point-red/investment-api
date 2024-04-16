@@ -59,7 +59,7 @@ export class CreateDepositService {
       isCashback: doc.isCashback,
       cashbacks: doc.cashbacks,
       note: doc.note,
-      formStatus: "draft",
+      formStatus: doc.formStatus,
       createdBy: doc.createdBy,
     });
 

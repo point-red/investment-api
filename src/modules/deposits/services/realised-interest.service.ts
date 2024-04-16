@@ -39,29 +39,15 @@ export class RealisedInterestService {
 
     delete doc.user;
 
-    const interests = [];
     let totalRemaining = 0;
-    for (const cashback of doc.interests) {
-      totalRemaining += Number(cashback.amount);
+    for (const interest of doc.interests) {
+      totalRemaining += Number(interest.net);
     }
     for (const interest of doc.interests) {
-      const payments = [];
-      interest.remaining = Number(interest.net);
-      for (const payment of interest.payments) {
-        payments.push({
-          bank: payment.bank,
-          account: payment.account,
-          date: payment.date,
-          amount: Number(payment.amount),
-          remaining: Number(interest.remaining),
-        });
-        interest.remaining -= Number(payment.amount);
-        totalRemaining -= Number(payment.amount);
-      }
-      interest.payments = payments;
-      interests.push(interest);
+      interest.net = Number(interest.net);
+      interest.received = Number(interest.received);
+      totalRemaining -= Number(interest.received);
     }
-    doc.interests = interests;
 
     if (totalRemaining == 0) {
       doc.status = "complete";
@@ -72,7 +58,6 @@ export class RealisedInterestService {
     await depositRepository.update(
       id,
       {
-        $set: { formStatus: "pending" },
         $push: {
           interestPayments: doc,
         },

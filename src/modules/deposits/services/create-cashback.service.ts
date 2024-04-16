@@ -39,27 +39,15 @@ export class CreateCashbackService {
 
     delete doc.user;
 
-    const cashbacks = [];
     let totalRemaining = 0;
     for (const cashback of doc.cashbacks) {
       totalRemaining += Number(cashback.amount);
     }
     for (const cashback of doc.cashbacks) {
-      const payments = [];
-      cashback.remaining = Number(cashback.amount);
-      for (const payment of cashback.payments) {
-        payments.push({
-          date: payment.date,
-          amount: Number(payment.amount),
-          remaining: Number(cashback.remaining),
-        });
-        cashback.remaining -= Number(payment.amount);
-        totalRemaining -= Number(payment.amount);
-      }
-      cashback.payments = payments;
-      cashbacks.push(cashback);
+      cashback.amount = Number(cashback.amount);
+      cashback.received = Number(cashback.received);
+      totalRemaining -= Number(cashback.received);
     }
-    doc.cashbacks = cashbacks;
 
     if (totalRemaining == 0) {
       doc.status = "complete";
@@ -70,7 +58,6 @@ export class CreateCashbackService {
     await depositRepository.update(
       id,
       {
-        $set: { formStatus: "pending" },
         $push: {
           cashbackPayments: doc,
         },
