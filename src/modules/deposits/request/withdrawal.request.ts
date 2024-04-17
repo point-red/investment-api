@@ -6,7 +6,6 @@ export const validate = (body: any) => {
     payments: "required|array",
     "payments.*.bank": "required",
     "payments.*.account": "required",
-    "payments.*.recipientName": "required",
     "payments.*.remaining": "required",
     "payments.*.date": "required",
     "payments.*.amount": "required",

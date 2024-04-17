@@ -251,12 +251,13 @@ export default class MongoDbConnection implements IDatabaseAdapter {
     }
 
     let search = {};
+    let searchArr = [];
     if (query.search) {
       for (const key in query.search) {
-        search = {
-          ...search,
-          [key]: { $regex: query.search[key], $options: "i" },
-        };
+        searchArr.push({ [key]: { $regex: query.search[key], $options: "i" } });
+      }
+      if (searchArr.length > 0) {
+        search = { $or: searchArr };
       }
     }
 

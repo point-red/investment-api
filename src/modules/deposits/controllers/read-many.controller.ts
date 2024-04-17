@@ -34,10 +34,74 @@ export const readMany = async (
       sort: (req.query.sort as any) ?? {},
     };
 
+    if (iQuery.filter["cashbackPayments"]) {
+      try {
+        if (iQuery.filter["cashbackPayments"] == "incomplete") {
+          delete iQuery.filter["cashbackPayments"];
+          iQuery.filter = {
+            ...iQuery.filter,
+            $or: [
+              { cashbackPayments: { $exists: false } },
+              { cashbackPayments: { $size: 0 } },
+              { "cashbackPayments.status": "incomplete" },
+            ],
+          };
+        } else {
+          iQuery.filter["cashbackPayments"] = {
+            $elemMatch: { status: iQuery.filter["cashbackPayments"] },
+          };
+        }
+      } catch (e) {}
+    }
+    if (iQuery.filter["interestPayments"]) {
+      try {
+        if (iQuery.filter["interestPayments"] == "incomplete") {
+          delete iQuery.filter["interestPayments"];
+          iQuery.filter = {
+            ...iQuery.filter,
+            $or: [
+              { interestPayments: { $exists: false } },
+              { interestPayments: { $size: 0 } },
+              { "interestPayments.status": "incomplete" },
+            ],
+          };
+        } else {
+          iQuery.filter["interestPayments"] = {
+            $elemMatch: { status: iQuery.filter["interestPayments"] },
+          };
+        }
+      } catch (e) {}
+    }
+    if (iQuery.filter["withdrawals"]) {
+      try {
+        if (iQuery.filter["withdrawals"] == "incomplete") {
+          delete iQuery.filter["withdrawals"];
+          iQuery.filter = {
+            ...iQuery.filter,
+            $or: [
+              { withdrawals: { $exists: false } },
+              { withdrawals: { $size: 0 } },
+              { "withdrawals.status": "incomplete" },
+              { withdrawals: { $elemMatch: { status: "incomplete" } } },
+            ],
+          };
+        } else {
+          iQuery.filter["withdrawals"] = {
+            $elemMatch: { status: iQuery.filter["withdrawals"] },
+          };
+        }
+      } catch (e) {}
+    }
+    if (iQuery.filter["isRollOver"]) {
+      try {
+        iQuery.filter["isRollOver"] = Boolean(
+          iQuery.filter["isRollOver"] === true
+        );
+      } catch (e) {}
+    }
     iQuery.filter = {
       ...iQuery.filter,
       deletedBy: { $exists: false },
-      "cashbackPayments.deletedBy": { $exists: false },
     };
 
     const result = await readManyDepositService.handle(iQuery);

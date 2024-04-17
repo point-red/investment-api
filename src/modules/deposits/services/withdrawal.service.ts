@@ -45,17 +45,27 @@ export class WithdrawalService {
 
     const payments = [];
     let remaining = Number(deposit.amount);
+    let totalRemaining = Number(deposit.amount);
+    if (deposit.isRollOver) {
+      totalRemaining += Number(deposit.netInterest);
+    }
     for (const payment of doc.payments) {
       payments.push({
         bank: payment.bank,
         account: payment.account,
-        recipientName: payment.recipientName,
         date: payment.date,
         amount: Number(payment.amount),
         remaining: remaining,
       });
       remaining -= Number(payment.amount);
     }
+
+    if (totalRemaining == 0) {
+      doc.status = "complete";
+    } else {
+      doc.status = "incomplete";
+    }
+
     doc.payments = payments;
     await depositRepository.update(
       id,

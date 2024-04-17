@@ -68,7 +68,7 @@ export class CalculateDepositService {
       }
     }
 
-    if (data.isRollOver) {
+    if (!data.isRollOver) {
       if (!data.returns || data.returns.length == 0) {
         data.formStatus = "draft";
       }
