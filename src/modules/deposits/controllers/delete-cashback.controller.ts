@@ -3,6 +3,7 @@ import { db } from "@src/database/database.js";
 import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
 import { DepositInterface } from "@src/modules/deposits/entities/deposit.entitiy.js";
 import RequestWithUser from "@src/interfaces/RequestWithUser.js";
+import { validate } from "../request/delete.request.js";
 import { DeleteCashbackService } from "@src/modules/deposits/services/delete-cashback.service.js";
 
 export const destroyCashback = async (
@@ -15,7 +16,7 @@ export const destroyCashback = async (
 
     db.startTransaction();
 
-    // validate(req.body);
+    validate(req.body);
 
     const readDepositService = new ReadDepositService(db);
     (await readDepositService.handle(req.params.id)) as DepositInterface;
@@ -24,7 +25,6 @@ export const destroyCashback = async (
 
     await deleteCashbackService.handle(
       req.params.id,
-      req.params.cashbackId,
       {
         ...req.body,
         deletedBy: {

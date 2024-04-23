@@ -17,17 +17,6 @@ export class RealisedInterestService {
     const depositRepository = new DepositRepository(this.db);
 
     if (doc._id) {
-      await depositRepository.update(
-        id,
-        {
-          $pull: { interestPayments: { _id: new ObjectId(doc._id) } },
-        },
-        {
-          session,
-          xraw: true,
-        }
-      );
-
       doc.updatedAt = new Date().toISOString();
       doc.updatedBy = doc.user;
       doc._id = new ObjectId(doc._id);
@@ -58,8 +47,8 @@ export class RealisedInterestService {
     await depositRepository.update(
       id,
       {
-        $push: {
-          interestPayments: doc,
+        $set: {
+          interestPayment: doc,
         },
       },
       {

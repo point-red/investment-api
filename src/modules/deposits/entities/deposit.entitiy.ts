@@ -15,7 +15,9 @@ export interface DepositInterface extends CreateDepositInterface {
   deletedAt?: string | null;
   deletedReason?: string | null;
   renewal_id?: string | ObjectId;
+  cashbackPayment?: any | null;
   cashbackPayments?: any[] | null;
+  interestPayment?: any;
   interestPayments?: any[] | null;
   withdrawals?: any[] | null;
 }

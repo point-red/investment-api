@@ -1,9 +1,8 @@
 import DatabaseConnection, {
   DocumentInterface,
 } from "@src/database/connection.js";
-import { DeleteDepositInterface } from "@src/modules/deposits/entities/deposit.entitiy.js";
 import { DepositRepository } from "@src/modules/deposits/repositories/deposit.repository.js";
-import { ObjectId } from "mongodb";
+import { DepositInterface } from "../entities/deposit.entitiy.js";
 
 export class DeleteCashbackService {
   private db: DatabaseConnection;
@@ -12,15 +11,24 @@ export class DeleteCashbackService {
   }
   public async handle(
     id: string,
-    cashbackId: string,
     doc: DocumentInterface,
     session: unknown
   ) {
     const depositRepository = new DepositRepository(this.db);
+    const deposit = (await depositRepository.read(
+      id
+    )) as unknown as DepositInterface;
+
+    const cashbackPayment = deposit.cashbackPayment;
+    cashbackPayment.deletedAt = new Date().toISOString();
+    cashbackPayment.deletedBy = doc.deletedBy;
+    cashbackPayment.deleteReason = doc.deleteReason;
+
     return await depositRepository.update(
       id,
       {
-        $pull: { cashbackPayments: { _id: new ObjectId(cashbackId) } },
+        $unset: { cashbackPayment: 1 },
+        $push: { cashbackPaymentArchives: cashbackPayment },
       },
       {
         session,

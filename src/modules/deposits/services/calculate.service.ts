@@ -72,6 +72,8 @@ export class CalculateDepositService {
       if (!data.returns || data.returns.length == 0) {
         data.formStatus = "draft";
       }
+    } else {
+      data.returns = []
     }
 
     if (data.cashbacks) {
@@ -85,9 +87,9 @@ export class CalculateDepositService {
       if (!data.cashbacks || data.cashbacks.length == 0) {
         data.formStatus = "draft";
       }
+    } else {
+      data.cashbacks = []
     }
-
-    console.log(data.formStatus);
 
     return data;
   }

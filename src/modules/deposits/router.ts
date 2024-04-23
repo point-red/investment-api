@@ -18,6 +18,7 @@ router.delete(
   "/:id/cashbacks/:cashbackId",
   auth,
   permission("deposit.delete"),
+  password,
   controller.destroyCashback
 );
 router.patch(
@@ -30,6 +31,7 @@ router.delete(
   "/:id/interests/:interestId",
   auth,
   permission("deposit.delete"),
+  password,
   controller.destroyInterest
 );
 router.patch(
@@ -42,6 +44,7 @@ router.delete(
   "/:id/withdrawals/:withdrawalId",
   auth,
   permission("deposit.delete"),
+  password,
   controller.destroyWithdrawal
 );
 router.patch(

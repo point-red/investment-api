@@ -1,10 +1,6 @@
 import DatabaseConnection, {
   DocumentInterface,
 } from "@src/database/connection.js";
-import {
-  DepositCashbackPaymentInterface,
-  DepositInterface,
-} from "@src/modules/deposits/entities/deposit.entitiy.js";
 import { DepositRepository } from "@src/modules/deposits/repositories/deposit.repository.js";
 import { ObjectId } from "mongodb";
 
@@ -17,17 +13,6 @@ export class CreateCashbackService {
     const depositRepository = new DepositRepository(this.db);
 
     if (doc._id) {
-      await depositRepository.update(
-        id,
-        {
-          $pull: { cashbackPayments: { _id: new ObjectId(doc._id) } },
-        },
-        {
-          session,
-          xraw: true,
-        }
-      );
-
       doc.updatedAt = new Date().toISOString();
       doc.updatedBy = doc.user;
       doc._id = new ObjectId(doc._id);
@@ -58,9 +43,7 @@ export class CreateCashbackService {
     await depositRepository.update(
       id,
       {
-        $push: {
-          cashbackPayments: doc,
-        },
+        $set: { cashbackPayment: doc },
       },
       {
         session,

@@ -3,7 +3,7 @@ import Validatorjs from "validatorjs";
 
 export const validate = (body: any) => {
   const validation = new Validatorjs(body, {
-    deletedReason: "required",
+    deleteReason: "required",
   });
 
   if (validation.fails()) {

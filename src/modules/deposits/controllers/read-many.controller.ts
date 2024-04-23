@@ -34,41 +34,37 @@ export const readMany = async (
       sort: (req.query.sort as any) ?? {},
     };
 
-    if (iQuery.filter["cashbackPayments"]) {
+    if (iQuery.filter["cashbackPayment"]) {
       try {
-        if (iQuery.filter["cashbackPayments"] == "incomplete") {
-          delete iQuery.filter["cashbackPayments"];
+        if (iQuery.filter["cashbackPayment"] == "incomplete") {
+          delete iQuery.filter["cashbackPayment"];
           iQuery.filter = {
             ...iQuery.filter,
             $or: [
-              { cashbackPayments: { $exists: false } },
-              { cashbackPayments: { $size: 0 } },
-              { "cashbackPayments.status": "incomplete" },
+              { cashbackPayment: { $exists: false } },
+              { "cashbackPayment.status": "incomplete" },
             ],
           };
         } else {
-          iQuery.filter["cashbackPayments"] = {
-            $elemMatch: { status: iQuery.filter["cashbackPayments"] },
-          };
+          iQuery.filter["cashbackPayment.status"] = iQuery.filter["cashbackPayment"];
+          delete iQuery.filter["cashbackPayment"]
         }
       } catch (e) {}
     }
-    if (iQuery.filter["interestPayments"]) {
+    if (iQuery.filter["interestPayment"]) {
       try {
-        if (iQuery.filter["interestPayments"] == "incomplete") {
-          delete iQuery.filter["interestPayments"];
+        if (iQuery.filter["interestPayment"] == "incomplete") {
+          delete iQuery.filter["interestPayment"];
           iQuery.filter = {
             ...iQuery.filter,
             $or: [
-              { interestPayments: { $exists: false } },
-              { interestPayments: { $size: 0 } },
-              { "interestPayments.status": "incomplete" },
+              { interestPayment: { $exists: false } },
+              { "interestPayment.status": "incomplete" },
             ],
           };
         } else {
-          iQuery.filter["interestPayments"] = {
-            $elemMatch: { status: iQuery.filter["interestPayments"] },
-          };
+          iQuery.filter["interestPayment.status"] = iQuery.filter["interestPayment"];
+          delete iQuery.filter["interestPayment"]
         }
       } catch (e) {}
     }
@@ -99,10 +95,20 @@ export const readMany = async (
         );
       } catch (e) {}
     }
+
+    let costumeFilter = {};
+    if (iQuery.archived) {
+      costumeFilter = { deletedBy: { $exists: true } };
+    } else {
+      costumeFilter = { deletedBy: { $exists: false } };
+    }
+
     iQuery.filter = {
       ...iQuery.filter,
-      deletedBy: { $exists: false },
+      ...costumeFilter 
     };
+
+    console.log(iQuery.filter)
 
     const result = await readManyDepositService.handle(iQuery);
 
