@@ -16,7 +16,7 @@ export const destroy = async (
 
     db.startTransaction();
 
-    // validate(req.body);
+    validate(req.body);
 
     const readDepositService = new ReadDepositService(db);
     (await readDepositService.handle(req.params.id)) as DepositInterface;

@@ -21,16 +21,24 @@ export class RenewalService {
     )) as unknown as DepositInterface;
     const depositEntity = new DepositEntity(deposit);
     const newDepositEntity = new DepositEntity({
-      ...depositEntity.deposit,
       _id: new ObjectId(),
+      deposit_id: new ObjectId(id),
       date: doc.date,
+      bilyetNumber: depositEntity.deposit.bilyetNumber,
       number: doc.number,
+      bank: depositEntity.deposit.bank,
+      account: depositEntity.deposit.account,
+      owner: depositEntity.deposit.owner,
       baseDate: doc.baseDate,
       tenor: doc.tenor,
       dueDate: doc.dueDate,
       isRollOver: doc.isRollOver,
       amount: doc.amount,
-      remaining: doc.remaining,
+      remaining: doc.amount,
+      sourceBank: depositEntity.deposit.sourceBank,
+      sourceBankAccount: depositEntity.deposit.sourceBankAccount,
+      recipientBank: depositEntity.deposit.recipientBank,
+      recipientBankAccount: depositEntity.deposit.recipientBankAccount,
       paymentMethod: doc.paymentMethod,
       interestRate: doc.interestRate,
       baseInterest: doc.baseInterest,
@@ -42,10 +50,7 @@ export class RenewalService {
       isCashback: doc.isCashback,
       cashbacks: doc.cashbacks,
       note: doc.note,
-      cashbackPayments: [],
-      interestPayments: [],
-      withdrawals: [],
-      formStatus: "draft",
+      formStatus: doc.formStatus,
       createdBy: doc.createdBy,
     });
 
@@ -56,10 +61,7 @@ export class RenewalService {
     await depositRepository.update(
       id,
       {
-        $set: { renewal_id: created._id, formStatus: "completed" },
-        $push: {
-          withdrawals: doc,
-        },
+        $set: { renewal_id: new ObjectId(created._id), remaining: 0 },
       },
       {
         session,

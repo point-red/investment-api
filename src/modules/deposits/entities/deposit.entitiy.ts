@@ -19,17 +19,19 @@ export interface DepositInterface extends CreateDepositInterface {
   cashbackPayments?: any[] | null;
   interestPayment?: any;
   interestPayments?: any[] | null;
+  withdrawal?: any;
   withdrawals?: any[] | null;
 }
 
 export interface DeleteDepositInterface {
   deletedBy?: UserInterface;
   deletedAt?: string | null;
-  deletedReason?: string | null;
+  deleteReason?: string | null;
   formStatus?: string;
 }
 
 export interface CreateDepositInterface {
+  deposit_id?: string | ObjectId;
   date: string;
   bilyetNumber?: string;
   number?: string;

@@ -16,7 +16,7 @@ export class DeleteDepositService {
   public async handle(id: string, doc: DocumentInterface, session: unknown) {
     const deleteDeposit: DeleteDepositInterface = {
       deletedBy: doc.deletedBy,
-      // deletedReason: doc.deletedReason,
+      deleteReason: doc.deleteReason,
       deletedAt: new Date().toISOString(),
       formStatus: "deleted",
     };
@@ -30,6 +30,24 @@ export class DeleteDepositService {
         deleteDeposit,
         {
           session,
+        }
+      );
+    } else if (deposit.deposit_id) {
+      // return parent remaining
+      const parentDeposit = (await readDepositService.handle(deposit.deposit_id as string)) as DepositInterface;
+      let remaining = deposit.amount
+      if (deposit.isRollOver) {
+        remaining = deposit.amount - (Number(parentDeposit.netInterest) || 0)
+      }
+      await depositRepository.update(
+        deposit.deposit_id as string,
+        {
+          $unset: { renewal_id: 1 },
+          $set: { remaining: remaining },
+        },
+        {
+          session,
+          xraw: true,
         }
       );
     }

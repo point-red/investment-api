@@ -108,8 +108,6 @@ export const readMany = async (
       ...costumeFilter 
     };
 
-    console.log(iQuery.filter)
-
     const result = await readManyDepositService.handle(iQuery);
 
     const pagination: PaginationInterface = {

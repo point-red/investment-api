@@ -4,6 +4,7 @@ import { ReadDepositService } from "@src/modules/deposits/services/read.service.
 import { DepositInterface } from "@src/modules/deposits/entities/deposit.entitiy.js";
 import RequestWithUser from "@src/interfaces/RequestWithUser.js";
 import { DeleteWithdrawalService } from "@src/modules/deposits/services/delete-withdrawal.service.js";
+import { validate } from "../request/delete.request.js";
 
 export const destroyWithdrawal = async (
   req: RequestWithUser,
@@ -15,7 +16,7 @@ export const destroyWithdrawal = async (
 
     db.startTransaction();
 
-    // validate(req.body);
+    validate(req.body);
 
     const readDepositService = new ReadDepositService(db);
     (await readDepositService.handle(req.params.id)) as DepositInterface;

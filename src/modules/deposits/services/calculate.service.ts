@@ -52,7 +52,7 @@ export class CalculateDepositService {
     let totalReturn = 0;
 
     data.formStatus = "complete";
-    if (data.returns) {
+    if (data.returns && data.returns.length > 0) {
       const returns = data.returns.sort((a, b) => a.baseDays - b.baseDays);
       for (const ret of returns) {
         lastDueDate = addDay(lastDueDate.toISOString(), ret.baseDays);
@@ -68,6 +68,14 @@ export class CalculateDepositService {
       }
     }
 
+    if (typeof data.isRollOver === 'string') {
+      if (data.isRollOver === 'false') {
+        data.isRollOver = false
+      } else {
+        data.isRollOver = true
+      }
+    }
+
     if (!data.isRollOver) {
       if (!data.returns || data.returns.length == 0) {
         data.formStatus = "draft";
@@ -80,6 +88,14 @@ export class CalculateDepositService {
       for (const cashback of data.cashbacks) {
         cashback.amount = Math.floor(data.amount * (cashback.rate / 100));
         cashback.remaining = cashback.amount;
+      }
+    }
+
+    if (typeof data.isCashback === 'string') {
+      if (data.isCashback === 'false') {
+        data.isCashback = false
+      } else {
+        data.isCashback = true
       }
     }
 

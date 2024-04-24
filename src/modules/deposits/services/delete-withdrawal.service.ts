@@ -20,11 +20,16 @@ export class DeleteWithdrawalService {
     const deposit = (await depositRepository.read(
       id
     )) as unknown as DepositInterface;
+
+    const withdrawal = deposit.withdrawal;
+    withdrawal.deletedAt = new Date().toISOString();
+    withdrawal.deletedBy = doc.deletedBy;
+    withdrawal.deleteReason = doc.deleteReason;
     return await depositRepository.update(
       id,
       {
-        $set: { remaining: deposit.amount },
-        $pull: { withdrawals: { _id: new ObjectId(withdrawalId) } },
+        $unset: { withdrawal: 1 },
+        $push: { withdrawalArchives: withdrawal },
       },
       {
         session,

@@ -21,17 +21,6 @@ export class WithdrawalService {
     )) as unknown as DepositInterface;
 
     if (doc._id) {
-      await depositRepository.update(
-        id,
-        {
-          $pull: { withdrawals: { _id: new ObjectId(doc._id) } },
-        },
-        {
-          session,
-          xraw: true,
-        }
-      );
-
       doc.updatedAt = new Date().toISOString();
       doc.updatedBy = doc.user;
       doc._id = new ObjectId(doc._id);
@@ -70,10 +59,7 @@ export class WithdrawalService {
     await depositRepository.update(
       id,
       {
-        $set: { remaining: remaining },
-        $push: {
-          withdrawals: doc,
-        },
+        $set: { withdrawal: doc, remaining: remaining },
       },
       {
         session,
