@@ -34,8 +34,8 @@ export class UpdateDepositService {
       tenor: doc.tenor,
       dueDate: doc.dueDate,
       isRollOver: doc.isRollOver,
-      amount: doc.amount,
-      remaining: doc.remaining,
+      amount: Number(doc.amount),
+      remaining: Number(doc.remaining),
       sourceBank: {
         _id: doc.sourceBank._id,
         name: doc.sourceBank.name,
@@ -69,20 +69,6 @@ export class UpdateDepositService {
       interestPayments: [],
       withdrawals: [],
     });
-
-    const readDepositService = new ReadDepositService(this.db);
-    const deposit = (await readDepositService.handle(id)) as DepositInterface;
-    if (deposit.renewal_id) {
-      const deleteDepositService = new DeleteDepositService(this.db);
-
-      await deleteDepositService.handle(
-        deposit.renewal_id as string,
-        {
-          deletedBy: doc.updatedBy,
-        },
-        session
-      );
-    }
 
     const depositRepository = new DepositRepository(this.db);
     return await depositRepository.update(id, depositEntity.deposit, {

@@ -33,8 +33,8 @@ export class RenewalService {
       tenor: doc.tenor,
       dueDate: doc.dueDate,
       isRollOver: doc.isRollOver,
-      amount: doc.amount,
-      remaining: doc.amount,
+      amount: Number(doc.amount),
+      remaining: Number(doc.amount),
       sourceBank: depositEntity.deposit.sourceBank,
       sourceBankAccount: depositEntity.deposit.sourceBankAccount,
       recipientBank: depositEntity.deposit.recipientBank,
@@ -58,10 +58,17 @@ export class RenewalService {
       session,
     });
 
+    let remaining = Number(deposit.remaining || 0) 
+    let renewalAmount = newDepositEntity.deposit.amount
+    if (deposit.isRollOver) {
+      renewalAmount = newDepositEntity.deposit.amount - Number(deposit.netInterest || 0)
+    }
+    remaining -= renewalAmount
+
     await depositRepository.update(
       id,
       {
-        $set: { renewal_id: new ObjectId(created._id), remaining: 0 },
+        $set: { renewal_id: new ObjectId(created._id), remaining: remaining, renewalAmount: newDepositEntity.deposit.amount },
       },
       {
         session,

@@ -24,26 +24,18 @@ export class DeleteDepositService {
     const depositRepository = new DepositRepository(this.db);
     const readDepositService = new ReadDepositService(this.db);
     const deposit = (await readDepositService.handle(id)) as DepositInterface;
-    if (deposit.renewal_id) {
-      await depositRepository.update(
-        deposit.renewal_id as string,
-        deleteDeposit,
-        {
-          session,
-        }
-      );
-    } else if (deposit.deposit_id) {
+    if (deposit.deposit_id) {
       // return parent remaining
       const parentDeposit = (await readDepositService.handle(deposit.deposit_id as string)) as DepositInterface;
-      let remaining = deposit.amount
-      if (deposit.isRollOver) {
+      let remaining = (Number(parentDeposit.remaining) || 0) +  Number(deposit.amount)
+      if (parentDeposit.isRollOver) {
         remaining = deposit.amount - (Number(parentDeposit.netInterest) || 0)
       }
       await depositRepository.update(
         deposit.deposit_id as string,
         {
           $unset: { renewal_id: 1 },
-          $set: { remaining: remaining },
+          $set: { remaining: remaining, renewalAmount: 0 },
         },
         {
           session,

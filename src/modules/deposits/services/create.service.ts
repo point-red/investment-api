@@ -30,8 +30,8 @@ export class CreateDepositService {
       tenor: doc.tenor,
       dueDate: doc.dueDate,
       isRollOver: doc.isRollOver,
-      amount: doc.amount,
-      remaining: doc.remaining,
+      amount: Number(doc.amount),
+      remaining: Number(doc.remaining),
       sourceBank: {
         _id: doc.sourceBank._id,
         name: doc.sourceBank.name,

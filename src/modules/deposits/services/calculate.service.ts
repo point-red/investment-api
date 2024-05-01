@@ -8,6 +8,7 @@ import { padWithZero } from "@src/utils/string.js";
 import { addDay } from "@src/utils/date.js";
 import { ReadManyDepositService } from "@src/modules/deposits/services/read-many.service.js";
 import { db } from "@src/database/database.js";
+import { DepositRepository } from "../repositories/deposit.repository.js";
 
 export class CalculateDepositService {
   public async calculate(body: DepositInterface, entity?: DepositInterface) {
@@ -18,9 +19,8 @@ export class CalculateDepositService {
     let date = new Date(
       data.date.replace(/(\d+[/])(\d+[/])/, "$2$1")
     ).toISOString();
-    data.date = date;
+    data.date = format(data.date.replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
     if (!entity) {
-      const readMany = new ReadManyDepositService(db);
       const iQuery: QueryInterface = {
         fields: "number",
         filter: {},
@@ -30,7 +30,8 @@ export class CalculateDepositService {
         sort: {},
       };
 
-      const deposits = await readMany.handle(iQuery);
+      const depositRepository = new DepositRepository(db);
+      const deposits = await depositRepository.readMany(iQuery)
       const documentCount = deposits.pagination.totalDocument;
 
       data.number = `DP/${format(date, "MM")}/${format(
@@ -43,7 +44,7 @@ export class CalculateDepositService {
     data.baseInterest = Math.floor(
       (data.amount * (data.interestRate / 100)) / data.baseDate
     );
-    data.dueDate = addDay(date, data.tenor).toISOString();
+    data.dueDate = format(addDay(date, data.tenor).toISOString(), 'yyyy-MM-dd');
     data.grossInterest = data.baseInterest * data.tenor;
     data.taxAmount = Math.floor(data.grossInterest * (data.taxRate / 100));
     data.netInterest = data.grossInterest - data.taxAmount;

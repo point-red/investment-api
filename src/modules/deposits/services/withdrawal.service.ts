@@ -34,9 +34,11 @@ export class WithdrawalService {
 
     const payments = [];
     let remaining = Number(deposit.amount);
-    let totalRemaining = Number(deposit.amount);
-    if (deposit.isRollOver) {
-      totalRemaining += Number(deposit.netInterest);
+    const renewalAmount = Number(deposit.renewalAmount || 0)
+    if (deposit.isRollOver && renewalAmount > 0) {
+      remaining = Number(deposit.amount) - Number(deposit.renewalAmount ) + Number(deposit.netInterest)
+    } else if (renewalAmount > 0) {
+      remaining = Number(deposit.amount) - Number(deposit.renewalAmount )
     }
     for (const payment of doc.payments) {
       payments.push({
@@ -49,7 +51,7 @@ export class WithdrawalService {
       remaining -= Number(payment.amount);
     }
 
-    if (totalRemaining == 0) {
+    if (remaining == 0) {
       doc.status = "complete";
     } else {
       doc.status = "incomplete";

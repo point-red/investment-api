@@ -21,6 +21,7 @@ export interface DepositInterface extends CreateDepositInterface {
   interestPayments?: any[] | null;
   withdrawal?: any;
   withdrawals?: any[] | null;
+  renewalAmount?: number
 }
 
 export interface DeleteDepositInterface {

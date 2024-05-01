@@ -1,5 +1,8 @@
+import { format } from "date-fns";
 import DatabaseConnection, {
+  DocumentInterface,
   QueryInterface,
+  ReadManyResultInterface,
 } from "@src/database/connection.js";
 import { DepositRepository } from "@src/modules/deposits/repositories/deposit.repository.js";
 import { DepositInterface } from "@src/modules/deposits/entities/deposit.entitiy.js";
@@ -10,11 +13,187 @@ export class ReadManyDepositService {
     this.db = db;
   }
   public async handle(query: QueryInterface) {
+    let dateFrom = format(new Date(), "yyyy-MM-dd");
+    if (query.filter['dateFrom']) {
+      try {
+        dateFrom = format(query.filter['dateFrom'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+        delete query.filter['dateFrom']
+      } catch (e) {}
+    }
+
+    let dateTo = format(new Date(), "yyyy-MM-dd");
+    if (query.filter['dateTo']) {
+      try {
+        dateTo = format(query.filter['dateTo'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+        delete query.filter['dateTo']
+      } catch (e) {}
+    }
+
+    const match = [];
+    match.push({ date: { $gte: dateFrom, $lte: dateTo } });
+    
+    if (query.filter["cashbackPayment"]) {
+      try {
+        if (query.filter["cashbackPayment"] == "incomplete") {
+          delete query.filter["cashbackPayment"];
+          query.filter = {
+            ...query.filter,
+            $or: [
+              { cashbackPayment: { $exists: false } },
+              { "cashbackPayment.status": "incomplete" },
+            ],
+          };
+        } else {
+          query.filter["cashbackPayment.status"] = query.filter["cashbackPayment"];
+          delete query.filter["cashbackPayment"]
+        }
+      } catch (e) {}
+    }
+    if (query.filter["interestPayment"]) {
+      try {
+        if (query.filter["interestPayment"] == "incomplete") {
+          delete query.filter["interestPayment"];
+          query.filter = {
+            ...query.filter,
+            $or: [
+              { interestPayment: { $exists: false } },
+              { "interestPayment.status": "incomplete" },
+            ],
+          };
+        } else {
+          query.filter["interestPayment.status"] = query.filter["interestPayment"];
+          delete query.filter["interestPayment"]
+        }
+      } catch (e) {}
+    }
+    if (query.filter["withdrawals"]) {
+      try {
+        if (query.filter["withdrawals"] == "incomplete") {
+          delete query.filter["withdrawals"];
+          query.filter = {
+            ...query.filter,
+            $or: [
+              { withdrawals: { $exists: false } },
+              { withdrawals: { $size: 0 } },
+              { "withdrawals.status": "incomplete" },
+              { withdrawals: { $elemMatch: { status: "incomplete" } } },
+            ],
+          };
+        } else {
+          query.filter["withdrawals"] = {
+            $elemMatch: { status: query.filter["withdrawals"] },
+          };
+        }
+      } catch (e) {}
+    }
+    if (query.filter["isRollOver"]) {
+      try {
+        query.filter["isRollOver"] = Boolean(
+          query.filter["isRollOver"] === true || query.filter["isRollOver"] === 'true'
+        );
+      } catch (e) {}
+    }
+    if (query.filter["isCashback"]) {
+      try {
+        query.filter["isCashback"] = Boolean(
+          query.filter["isCashback"] === true || query.filter["isCashback"] === 'true'
+        );
+      } catch (e) {}
+    }
+
+    let costumeFilter = {};
+    if (query.filter["renewalStatus"]) {
+      try {
+        if (query.filter["renewalStatus"] == 'complete') {
+          query.filter['renewal_id'] = { $exists: true };
+        } else if (query.filter["renewalStatus"] == 'incomplete') {
+          query.filter['renewal_id'] = { $exists: false };
+        }
+        delete query.filter["renewalStatus"]
+      } catch (e) {}
+    }
+    
+    if (query.archived) {
+      costumeFilter = { deletedBy: { $exists: true } };
+    } else {
+      costumeFilter = { deletedBy: { $exists: false } };
+    }
+
+    query.filter = {
+      ...query.filter,
+      ...costumeFilter 
+    };
+
+    for (const key in query.filter) {
+      match.push({[key]: query.filter[key]})
+    }
+    
+    let searchArr = [];
+    if (query.search) {
+      for (const key in query.search) {
+        const regexPattern = new RegExp(query.search[key], 'i'); // Case insensitive regex
+        const regexQuery = {
+            $expr: {
+                $regexMatch: {
+                    input: { $toString: `$${key}` }, // Convert field to a string for regex matching
+                    regex: regexPattern
+                }
+            }
+        };
+        searchArr.push(regexQuery);
+    }
+      if (searchArr.length > 0) {
+        match.push({ $or: searchArr });
+      }
+    }
+
+    let querySort: any = {};
+    if (query.sort) {
+      for (const key in query.sort) {
+        querySort[key] = query.sort[key] === "desc" ? -1 : 1;
+      }
+    }
+
+    const pipeline = [
+      ...(match.length > 0
+        ? [
+          {
+            $match: {
+              $and: match,
+            },
+          },
+        ]
+        : []),
+        {
+          $sort: querySort
+        },
+      // {
+      //   $lookup: {
+      //     from: "deposits",
+      //     localField: "bilyetNumber",
+      //     foreignField: "bilyetNumber",
+      //     as: "childs"
+      //   }
+      // },
+      {
+        $group: {
+          _id: "$bilyetNumber",
+          deposits: { $push: "$$ROOT" } // Push the entire document to the deposits array
+        }
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id field from the output
+          bilyetNumber: "$_id", // Rename _id to bilyetNumber
+          deposits: 1 // Include deposits array in the output
+        }
+      }
+    ];
     const depositRepository = new DepositRepository(this.db);
-    const result = await depositRepository.readMany(query);
+    const result = await depositRepository.aggregate(pipeline, query) as ReadManyResultInterface;
 
     return {
-      deposits: result.data as unknown as Array<DepositInterface>,
+      depositGroup: result.data as unknown as Array<DepositInterface>,
       pagination: result.pagination,
     };
   }
