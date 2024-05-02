@@ -61,6 +61,7 @@ export interface CreateDepositInterface {
   formStatus?: string;
   returns: DepositReturnInterface[];
   cashbacks?: DepositCashbackInterface[];
+  index?: number;
 }
 
 export interface DepositBankInterface {

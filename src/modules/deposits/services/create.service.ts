@@ -61,6 +61,7 @@ export class CreateDepositService {
       note: doc.note,
       formStatus: doc.formStatus,
       createdBy: doc.createdBy,
+      index: 0
     });
 
     const depositRepository = new DepositRepository(this.db);

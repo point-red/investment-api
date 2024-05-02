@@ -52,6 +52,7 @@ export class RenewalService {
       note: doc.note,
       formStatus: doc.formStatus,
       createdBy: doc.createdBy,
+      index: (depositEntity.deposit.index || 0) + 1
     });
 
     const created = await depositRepository.create(newDepositEntity.deposit, {

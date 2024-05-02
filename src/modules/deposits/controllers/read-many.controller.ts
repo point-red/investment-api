@@ -12,7 +12,7 @@ export interface PaginationInterface {
 }
 
 export interface ResponseInterface {
-  depositGroup: Array<DepositInterface>;
+  deposits: Array<DepositInterface>;
   pagination: PaginationInterface;
 }
 
@@ -32,7 +32,7 @@ export const readMany = async (
       page: Number(req.query.page ?? 1),
       pageSize: Number(req.query.pageSize ?? 10),
       sort: (req.query.sort as any) ?? {},
-    };    
+    };
 
     const result = await readManyDepositService.handle(iQuery);    
 
@@ -44,7 +44,7 @@ export const readMany = async (
     };
 
     const response: ResponseInterface = {
-      depositGroup: result.depositGroup,
+      deposits: result.deposits,
       pagination: pagination,
     };
 

@@ -18,7 +18,7 @@ export class ReadManyDepositService {
       try {
         dateFrom = format(query.filter['dateFrom'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
         delete query.filter['dateFrom']
-      } catch (e) {}
+      } catch (e) { }
     }
 
     let dateTo = format(new Date(), "yyyy-MM-dd");
@@ -26,12 +26,27 @@ export class ReadManyDepositService {
       try {
         dateTo = format(query.filter['dateTo'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
         delete query.filter['dateTo']
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const match = [];
-    match.push({ date: { $gte: dateFrom, $lte: dateTo } });
-    
+    if (query.filter['dueDateTo'] && query.filter['dueDateFrom']) {
+      try {
+        const dueDateFrom = format(query.filter['dueDateFrom'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+        const dueDateTo = format(query.filter['dueDateTo'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+        delete query.filter['dueDateTo']
+        delete query.filter['dueDateFrom']
+        match.push({
+          $or: [
+            { date: { $gte: dateFrom, $lte: dateTo } },
+            { deuDate: { $gte: dueDateFrom, $lte: dueDateTo } },
+          ],
+        });
+      } catch (e) { }
+    } else {
+      match.push({ date: { $gte: dateFrom, $lte: dateTo } });
+    }
+
     if (query.filter["cashbackPayment"]) {
       try {
         if (query.filter["cashbackPayment"] == "incomplete") {
@@ -47,7 +62,7 @@ export class ReadManyDepositService {
           query.filter["cashbackPayment.status"] = query.filter["cashbackPayment"];
           delete query.filter["cashbackPayment"]
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     if (query.filter["interestPayment"]) {
       try {
@@ -64,7 +79,7 @@ export class ReadManyDepositService {
           query.filter["interestPayment.status"] = query.filter["interestPayment"];
           delete query.filter["interestPayment"]
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     if (query.filter["withdrawals"]) {
       try {
@@ -84,21 +99,21 @@ export class ReadManyDepositService {
             $elemMatch: { status: query.filter["withdrawals"] },
           };
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     if (query.filter["isRollOver"]) {
       try {
         query.filter["isRollOver"] = Boolean(
           query.filter["isRollOver"] === true || query.filter["isRollOver"] === 'true'
         );
-      } catch (e) {}
+      } catch (e) { }
     }
     if (query.filter["isCashback"]) {
       try {
         query.filter["isCashback"] = Boolean(
           query.filter["isCashback"] === true || query.filter["isCashback"] === 'true'
         );
-      } catch (e) {}
+      } catch (e) { }
     }
 
     let costumeFilter = {};
@@ -110,9 +125,9 @@ export class ReadManyDepositService {
           query.filter['renewal_id'] = { $exists: false };
         }
         delete query.filter["renewalStatus"]
-      } catch (e) {}
+      } catch (e) { }
     }
-    
+
     if (query.archived) {
       costumeFilter = { deletedBy: { $exists: true } };
     } else {
@@ -121,27 +136,27 @@ export class ReadManyDepositService {
 
     query.filter = {
       ...query.filter,
-      ...costumeFilter 
+      ...costumeFilter
     };
 
     for (const key in query.filter) {
-      match.push({[key]: query.filter[key]})
+      match.push({ [key]: query.filter[key] })
     }
-    
+
     let searchArr = [];
     if (query.search) {
       for (const key in query.search) {
         const regexPattern = new RegExp(query.search[key], 'i'); // Case insensitive regex
         const regexQuery = {
-            $expr: {
-                $regexMatch: {
-                    input: { $toString: `$${key}` }, // Convert field to a string for regex matching
-                    regex: regexPattern
-                }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: `$${key}` }, // Convert field to a string for regex matching
+              regex: regexPattern
             }
+          }
         };
         searchArr.push(regexQuery);
-    }
+      }
       if (searchArr.length > 0) {
         match.push({ $or: searchArr });
       }
@@ -154,6 +169,34 @@ export class ReadManyDepositService {
       }
     }
 
+    // const pipeline = [
+    //   ...(match.length > 0
+    //     ? [
+    //       {
+    //         $match: {
+    //           $and: match,
+    //         },
+    //       },
+    //     ]
+    //     : []),
+    //     {
+    //       $sort: querySort
+    //     },
+    //   {
+    //     $group: {
+    //       _id: "$bilyetNumber",
+    //       deposits: { $push: "$$ROOT" }
+    //     }
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 0, 
+    //       bilyetNumber: "$_id", 
+    //       deposits: 1
+    //     }
+    //   }
+    // ];
+
     const pipeline = [
       ...(match.length > 0
         ? [
@@ -164,36 +207,45 @@ export class ReadManyDepositService {
           },
         ]
         : []),
-        {
-          $sort: querySort
-        },
-      // {
-      //   $lookup: {
-      //     from: "deposits",
-      //     localField: "bilyetNumber",
-      //     foreignField: "bilyetNumber",
-      //     as: "childs"
-      //   }
-      // },
+      {
+        $sort: querySort
+      },
       {
         $group: {
-          _id: "$bilyetNumber",
-          deposits: { $push: "$$ROOT" } // Push the entire document to the deposits array
+          _id: '$bilyetNumber',
+          deposits: { $first: '$$ROOT' }
         }
       },
       {
-        $project: {
-          _id: 0, // Exclude _id field from the output
-          bilyetNumber: "$_id", // Rename _id to bilyetNumber
-          deposits: 1 // Include deposits array in the output
-        }
+        $replaceRoot: { newRoot: '$deposits' }
       }
+      // {
+      //   $graphLookup: {
+      //     from: 'deposits',
+      //     startWith: '$deposit.renewal_id',
+      //     connectFromField: 'deposit.renewal_idyour',
+      //     connectToField: 'deposit_id',
+      //     as: 'childs',
+      //   }
+      // }
     ];
+
     const depositRepository = new DepositRepository(this.db);
     const result = await depositRepository.aggregate(pipeline, query) as ReadManyResultInterface;
 
+    for (const deposit of result.data) {
+      query.page = 1
+      query.pageSize = 100
+      query.filter = {
+        ...query.filter,
+        index: { $gt: deposit.index }
+      };
+      const renewals = await depositRepository.readMany(query)
+      deposit['renewals'] = renewals.data
+    }
+
     return {
-      depositGroup: result.data as unknown as Array<DepositInterface>,
+      deposits: result.data as unknown as Array<DepositInterface>,
       pagination: result.pagination,
     };
   }
