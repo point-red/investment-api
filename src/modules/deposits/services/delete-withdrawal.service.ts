@@ -21,6 +21,15 @@ export class DeleteWithdrawalService {
       id
     )) as unknown as DepositInterface;
 
+    let paymentAmount = 0
+    if (deposit.withdrawal?.payments) {
+      for (const payment of deposit.withdrawal.payments) {
+        paymentAmount += Number(payment.amount)
+      }
+    }
+
+    const remaining = Number(deposit.remaining || 0) + paymentAmount
+
     const withdrawal = deposit.withdrawal;
     withdrawal.deletedAt = new Date().toISOString();
     withdrawal.deletedBy = doc.deletedBy;
@@ -30,6 +39,7 @@ export class DeleteWithdrawalService {
       {
         $unset: { withdrawal: 1 },
         $push: { withdrawalArchives: withdrawal },
+        $set: { remaining: remaining },
       },
       {
         session,

@@ -88,15 +88,17 @@ export class ReadManyDepositService {
           query.filter = {
             ...query.filter,
             $or: [
-              { withdrawals: { $exists: false } },
-              { withdrawals: { $size: 0 } },
-              { "withdrawals.status": "incomplete" },
-              { withdrawals: { $elemMatch: { status: "incomplete" } } },
+              { remaining: { $gt: 0 } },
+              { remaining: { $ne: '0' } },
             ],
           };
         } else {
-          query.filter["withdrawals"] = {
-            $elemMatch: { status: query.filter["withdrawals"] },
+          query.filter = {
+            ...query.filter,
+            $or: [
+              { remaining: 0 },
+              { remaining: '0' },
+            ],
           };
         }
       } catch (e) { }
