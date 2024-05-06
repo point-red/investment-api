@@ -93,6 +93,7 @@ export class ReadManyDepositService {
             ],
           };
         } else {
+          delete query.filter["withdrawals"];
           query.filter = {
             ...query.filter,
             $or: [
