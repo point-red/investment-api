@@ -6,7 +6,7 @@ import * as controller from "./controllers/index.js";
 
 const router = Router();
 
-router.get("/", auth, permission("deposit.view"), controller.readMany);
+router.get("/", auth, permission("deposit.view", "deposit.withdrawal"), controller.readMany);
 router.post("/", auth, permission("deposit.create"), controller.create);
 router.patch(
   "/:id/cashbacks",
@@ -37,13 +37,13 @@ router.delete(
 router.patch(
   "/:id/withdrawals",
   auth,
-  permission("deposit.update"),
+  permission("deposit.update", "deposit.withdrawal"),
   controller.withdrawal
 );
 router.delete(
   "/:id/withdrawals/:withdrawalId",
   auth,
-  permission("deposit.delete"),
+  permission("deposit.delete", "deposit.withdrawal"),
   password,
   controller.destroyWithdrawal
 );
