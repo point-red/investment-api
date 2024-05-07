@@ -1,5 +1,6 @@
 import DatabaseConnection, {
   DocumentInterface,
+  QueryInterface,
 } from "@src/database/connection.js";
 import {
   DepositCashbackPaymentInterface,
@@ -15,17 +16,35 @@ export class RenewalService {
     this.db = db;
   }
   public async handle(id: string, doc: DocumentInterface, session: unknown) {
+    const iQuery: QueryInterface = {
+      fields: "",
+      filter: { bilyetNumber: doc.bilyetNumber, index: 0 },
+      archived: false,
+      search: {},
+      page: 1,
+      pageSize: 1,
+      sort: {},
+    };
+
     const depositRepository = new DepositRepository(this.db);
     const deposit = (await depositRepository.read(
       id
     )) as unknown as DepositInterface;
     const depositEntity = new DepositEntity(deposit);
+
+    const mainDeposits = await depositRepository.readMany(iQuery)
+
+    let number = doc.number
+    if (mainDeposits.data && mainDeposits.data[0]) {
+      number = mainDeposits.data[0].number + '/' + ((depositEntity.deposit.index || 0) + 1)
+    }    
+
     const newDepositEntity = new DepositEntity({
       _id: new ObjectId(),
       deposit_id: new ObjectId(id),
       date: doc.date,
       bilyetNumber: depositEntity.deposit.bilyetNumber,
-      number: doc.number,
+      number: number,
       bank: depositEntity.deposit.bank,
       account: depositEntity.deposit.account,
       owner: depositEntity.deposit.owner,

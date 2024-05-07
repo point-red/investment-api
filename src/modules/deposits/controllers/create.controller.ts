@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { validate } from "../request/create.request.js";
 import { db } from "@src/database/database.js";
+import { ApiError } from '@point-hub/express-error-handler';
 import RequestWithUser from "@src/interfaces/RequestWithUser.js";
 import { CreateDepositService } from "@src/modules/deposits/services/create.service.js";
 import {
@@ -12,6 +13,8 @@ import {
 import { ReadDepositService } from "@src/modules/deposits/services/read.service.js";
 import { CalculateDepositService } from "@src/modules/deposits/services/calculate.service.js";
 import { ObjectId } from "mongodb";
+import { DepositRepository } from "../repositories/deposit.repository.js";
+import { QueryInterface } from "@src/database/connection.js";
 
 export const create = async (
   req: RequestWithUser,
@@ -24,6 +27,21 @@ export const create = async (
     db.startTransaction();
 
     validate(req.body);
+
+    const iQuery: QueryInterface = {
+        fields: "number",
+        filter: { bilyetNumber: req.body.bilyetNumber },
+        search: {},
+        page: 1,
+        pageSize: 1,
+        sort: {},
+    };
+
+      const depositRepository = new DepositRepository(db);
+      const deposits = await depositRepository.readMany(iQuery)
+      if (deposits.data && deposits.data.length > 0) {
+        throw new ApiError(400, { message: "Bilyet Number already exist" });
+      }
 
     const calculate = new CalculateDepositService();
     const data: CreateDepositInterface = await calculate.calculate(req.body);

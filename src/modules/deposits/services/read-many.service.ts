@@ -241,6 +241,7 @@ export class ReadManyDepositService {
       query.pageSize = 100
       query.filter = {
         ...query.filter,
+        bilyetNumber: deposit.bilyetNumber,
         index: { $gt: deposit.index }
       };
       const renewals = await depositRepository.readMany(query)
