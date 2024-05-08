@@ -221,7 +221,10 @@ export class ReadManyDepositService {
       },
       {
         $replaceRoot: { newRoot: '$deposits' }
-      }
+      },
+      {
+        $sort: querySort
+      },
       // {
       //   $graphLookup: {
       //     from: 'deposits',
