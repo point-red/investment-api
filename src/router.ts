@@ -4,6 +4,7 @@ import rolesRouter from "./modules/roles/router.js";
 import usersRouter from "./modules/users/router.js";
 import ownersRouter from "./modules/owners/router.js";
 import bankRouter from "./modules/banks/router.js";
+import depositRouter from "./modules/deposits/router.js";
 
 export default function () {
   const app: Express = express();
@@ -16,6 +17,7 @@ export default function () {
   app.use(`/users`, usersRouter);
   app.use(`/owners`, ownersRouter);
   app.use(`/banks`, bankRouter);
+  app.use(`/deposits`, depositRouter);
 
   return app;
 }

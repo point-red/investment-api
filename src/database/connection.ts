@@ -47,6 +47,7 @@ export interface ReadManyOptionsInterface {
 }
 
 export interface UpdateOptionsInterface {
+  xraw?: boolean;
   session: unknown;
 }
 
@@ -108,15 +109,38 @@ export interface IDatabaseAdapter {
   startTransaction(): this;
   commitTransaction(): Promise<this>;
   abortTransaction(): Promise<this>;
-  create(doc: DocumentInterface, options?: CreateOptionsInterface): Promise<CreateResultInterface>;
-  createMany(doc: DocumentInterface, options?: CreateOptionsInterface): Promise<unknown>;
-  read(id: string, options?: ReadOptionsInterface): Promise<ReadResultInterface>;
-  readMany(query: QueryInterface, options?: ReadManyOptionsInterface): Promise<ReadManyResultInterface>;
-  update(id: string, doc: DocumentInterface, options?: UpdateOptionsInterface): Promise<UpdateResultInterface>;
-  delete(id: string, options?: DeleteOptionsInterface): Promise<DeleteResultInterface>;
+  create(
+    doc: DocumentInterface,
+    options?: CreateOptionsInterface
+  ): Promise<CreateResultInterface>;
+  createMany(
+    doc: DocumentInterface,
+    options?: CreateOptionsInterface
+  ): Promise<unknown>;
+  read(
+    id: string,
+    options?: ReadOptionsInterface
+  ): Promise<ReadResultInterface>;
+  readMany(
+    query: QueryInterface,
+    options?: ReadManyOptionsInterface
+  ): Promise<ReadManyResultInterface>;
+  update(
+    id: string,
+    doc: DocumentInterface,
+    options?: UpdateOptionsInterface
+  ): Promise<UpdateResultInterface>;
+  delete(
+    id: string,
+    options?: DeleteOptionsInterface
+  ): Promise<DeleteResultInterface>;
   deleteMany(id: string, options?: DeleteOptionsInterface): Promise<unknown>;
   deleteAll(options?: DeleteOptionsInterface): Promise<unknown>;
-  aggregate(pipeline: any, query: any, options?: AggregateOptionsInterface): Promise<unknown>;
+  aggregate(
+    pipeline: any,
+    query: any,
+    options?: AggregateOptionsInterface
+  ): Promise<unknown>;
 }
 
 export default class DatabaseConnection {
@@ -177,19 +201,31 @@ export default class DatabaseConnection {
     return this;
   }
 
-  public async create(doc: DocumentInterface, options?: CreateOptionsInterface): Promise<CreateResultInterface> {
+  public async create(
+    doc: DocumentInterface,
+    options?: CreateOptionsInterface
+  ): Promise<CreateResultInterface> {
     return await this.adapter.create(doc, options);
   }
 
-  public async createMany(docs: DocumentInterface[], options?: CreateOptionsInterface): Promise<unknown> {
+  public async createMany(
+    docs: DocumentInterface[],
+    options?: CreateOptionsInterface
+  ): Promise<unknown> {
     return await this.adapter.createMany(docs, options);
   }
 
-  public async read(id: string, options?: ReadOptionsInterface): Promise<ReadResultInterface> {
+  public async read(
+    id: string,
+    options?: ReadOptionsInterface
+  ): Promise<ReadResultInterface> {
     return await this.adapter.read(id, options);
   }
 
-  public async readMany(query: QueryInterface, options?: ReadManyOptionsInterface): Promise<ReadManyResultInterface> {
+  public async readMany(
+    query: QueryInterface,
+    options?: ReadManyOptionsInterface
+  ): Promise<ReadManyResultInterface> {
     return await this.adapter.readMany(query, options);
   }
 
@@ -201,7 +237,10 @@ export default class DatabaseConnection {
     return await this.adapter.update(id, doc, options);
   }
 
-  public async delete(id: string, options?: DeleteOptionsInterface): Promise<DeleteResultInterface> {
+  public async delete(
+    id: string,
+    options?: DeleteOptionsInterface
+  ): Promise<DeleteResultInterface> {
     return await this.adapter.delete(id, options);
   }
 
@@ -235,9 +274,14 @@ export default class DatabaseConnection {
    * Create new collection if not exists and update schema validation or indexes
    */
   public async createCollections() {
-    const object = await fileSearch("/*.schema.ts", "./src/modules", { maxDeep: 2, regExp: true });
+    const object = await fileSearch("/*.schema.ts", "./src/modules", {
+      maxDeep: 2,
+      regExp: true,
+    });
     for (const property in object) {
-      const path = `../modules/${object[property].path.replace("\\", "/").replace(".ts", ".js")}`;
+      const path = `../modules/${object[property].path
+        .replace("\\", "/")
+        .replace(".ts", ".js")}`;
       const { createCollection } = await import(path);
       await createCollection(this);
     }
@@ -249,9 +293,14 @@ export default class DatabaseConnection {
    * Drop collections function is for testing purpose, so every test can generate fresh database
    */
   public async dropCollections() {
-    const object = await fileSearch("/*.schema.ts", "./src/modules", { maxDeep: 2, regExp: true });
+    const object = await fileSearch("/*.schema.ts", "./src/modules", {
+      maxDeep: 2,
+      regExp: true,
+    });
     for (const property in object) {
-      const path = `../modules/${object[property].path.replace("\\", "/").replace(".ts", ".js")}`;
+      const path = `../modules/${object[property].path
+        .replace("\\", "/")
+        .replace(".ts", ".js")}`;
       const { dropCollection } = await import(path);
       await dropCollection(this);
     }
