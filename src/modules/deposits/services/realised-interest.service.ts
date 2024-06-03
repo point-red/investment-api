@@ -35,7 +35,12 @@ export class RealisedInterestService {
     for (const interest of doc.interests) {
       interest.net = Number(interest.net);
       interest.received = Number(interest.received);
-      totalRemaining -= Number(interest.received);
+      totalRemaining = Number(totalRemaining) - Number(interest.received);
+      if (interest.corrections) {
+        for (const correction of interest.corrections) {
+          totalRemaining = Number(totalRemaining) - Number(correction.received);
+        }
+      }
     }
 
     if (totalRemaining == 0) {
