@@ -13,27 +13,15 @@ export class ReadManyDepositService {
     this.db = db;
   }
   public async handle(query: QueryInterface) {
-    let dateFrom = format(new Date(), "yyyy-MM-dd");
-    if (query.filter['dateFrom']) {
-      try {
-        dateFrom = format(query.filter['dateFrom'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
-        delete query.filter['dateFrom']
-      } catch (e) { }
-    }
-
-    let dateTo = format(new Date(), "yyyy-MM-dd");
-    if (query.filter['dateTo']) {
-      try {
-        dateTo = format(query.filter['dateTo'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
-        delete query.filter['dateTo']
-      } catch (e) { }
-    }
-
     const match = [];
-    if (query.filter['dueDateTo'] && query.filter['dueDateFrom']) {
+    if (query.filter['dateFrom'] && query.filter['dateTo'] && query.filter['dueDateTo'] && query.filter['dueDateFrom']) {
       try {
+        const dateFrom = format(query.filter['dateFrom'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+        const dateTo = format(query.filter['dateTo'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
         const dueDateFrom = format(query.filter['dueDateFrom'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
         const dueDateTo = format(query.filter['dueDateTo'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+        delete query.filter['dateFrom']
+        delete query.filter['dateTo']
         delete query.filter['dueDateTo']
         delete query.filter['dueDateFrom']
         match.push({
@@ -42,9 +30,21 @@ export class ReadManyDepositService {
             { deuDate: { $gte: dueDateFrom, $lte: dueDateTo } },
           ],
         });
-      } catch (e) { }
-    } else {
-      match.push({ date: { $gte: dateFrom, $lte: dateTo } });
+      } catch (e) {}
+    } else if (query.filter['dateFrom'] && query.filter['dateTo']) {
+      try {
+        const dateFrom = format(query.filter['dateFrom'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+        const dateTo = format(query.filter['dateTo'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+        delete query.filter['dateFrom']
+        delete query.filter['dateTo']
+        match.push({ date: { $gte: dateFrom, $lte: dateTo } });
+      } catch (e) {}
+    } else if (query.filter['dueDateTo'] && query.filter['dueDateFrom']) {
+      const dueDateFrom = format(query.filter['dueDateFrom'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+      const dueDateTo = format(query.filter['dueDateTo'].replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
+      delete query.filter['dueDateTo']
+      delete query.filter['dueDateFrom']
+      match.push({ dueDate: { $gte: dueDateFrom, $lte: dueDateTo } });
     }
 
     if (query.filter["cashbackPayment"]) {
