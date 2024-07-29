@@ -10,3 +10,4 @@ export { renewal } from "./renewal.controller.js";
 export { destroyCashback } from "./delete-cashback.controller.js";
 export { destroyInterest } from "./delete-interest.controller.js";
 export { destroyWithdrawal } from "./delete-withdrawal.controller.js";
+export { readReports } from "./read-report.controller.js"

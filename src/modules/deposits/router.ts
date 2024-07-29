@@ -6,6 +6,7 @@ import permission from "@src/middleware/permission.js";
 
 const router = Router();
 
+router.get("/report", auth, permission("deposit.view", "withdrawal.view"), controller.readReports);
 router.get("/", auth, permission("deposit.view", "withdrawal.view"), controller.readMany);
 router.post("/", auth, permission("deposit.create"), controller.create);
 router.patch("/:id/cashbacks", auth, permission("deposit.create"), controller.createCashback);
