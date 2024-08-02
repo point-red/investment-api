@@ -1,4 +1,3 @@
-import ExcelJS from "exceljs";
 import { NextFunction, Request, Response } from "express";
 import { ReadReportService } from "../services/read-report.service.js";
 import { QueryInterface } from "@src/database/connection.js";

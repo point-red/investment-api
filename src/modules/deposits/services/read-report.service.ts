@@ -122,6 +122,8 @@ export class ReadReportService {
       //     $replaceRoot: { newRoot: "$deposits" },
       //   },
     ];
+    console.log(pipeline)
+    console.log(query)
 
     const depositRepository = new DepositRepository(this.db);
     const result = (await depositRepository.aggregate(pipeline, query)) as ReadManyResultInterface;
