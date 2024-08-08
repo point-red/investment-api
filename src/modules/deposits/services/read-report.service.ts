@@ -63,14 +63,14 @@ export class ReadReportService {
       try {
         if (query.filter["placementType"] == "all") {
         } else if (query.filter["placementType"] == "renewal") {
-          query.filter["deposit_id"] = { $exists: true };
+          query.filter = {
+            ...query.filter,
+            $and: [{ withdrawal: { $exists: false } }, { renewal_id: { $exists: false } }],
+          };
         } else if (query.filter["placementType"] == "withdrawn") {
           query.filter["withdrawal"] = { $exists: true };
         } else if (query.filter["placementType"] == "placement") {
-          query.filter = {
-            ...query.filter,
-            $and: [{ withdrawal: { $exists: false } }, { deposit_id: { $exists: false } }],
-          };
+          query.filter["deposit_id"] = { $exists: false };
         }
         delete query.filter["placementType"];
       } catch (e) {}
@@ -122,8 +122,6 @@ export class ReadReportService {
       //     $replaceRoot: { newRoot: "$deposits" },
       //   },
     ];
-    console.log(pipeline)
-    console.log(query)
 
     const depositRepository = new DepositRepository(this.db);
     const result = (await depositRepository.aggregate(pipeline, query)) as ReadManyResultInterface;
