@@ -62,7 +62,7 @@ export class ReadReportService {
     if (query.filter["placementType"]) {
       try {
         if (query.filter["placementType"] == "all") {
-        } else if (query.filter["placementType"] == "renewal") {
+        } else if (query.filter["placementType"] == "active") {
           query.filter = {
             ...query.filter,
             $and: [{ withdrawal: { $exists: false } }, { renewal_id: { $exists: false } }],
