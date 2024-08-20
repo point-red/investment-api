@@ -65,12 +65,7 @@ export class ReadReportService {
         } else if (query.filter["placementType"] == "active") {
           query.filter = {
             ...query.filter,
-            $and: [
-              {
-                $or: [{ remaining: { $gt: 0 } }, { remaining: { $ne: "0" } }],
-              },
-              { renewal_id: { $exists: false } },
-            ],
+            $and: [{ remaining: { $gt: 0 } }, { renewal_id: { $exists: false } }],
           };
         } else if (query.filter["placementType"] == "withdrawn") {
           query.filter["withdrawal"] = { $exists: true };
