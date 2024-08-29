@@ -112,15 +112,6 @@ export class ReadReportService {
       {
         $sort: querySort,
       },
-      //   {
-      //     $group: {
-      //       _id: "$bilyetNumber",
-      //       deposits: { $first: "$$ROOT" },
-      //     },
-      //   },
-      //   {
-      //     $replaceRoot: { newRoot: "$deposits" },
-      //   },
     ];
 
     const depositRepository = new DepositRepository(this.db);
