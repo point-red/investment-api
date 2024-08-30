@@ -28,8 +28,8 @@ export interface QueryInterface {
   archived?: boolean;
   search?: SearchInterface;
   filter: FilterInterface;
-  page: number;
-  pageSize: number;
+  page?: number;
+  pageSize?: number;
   sort: SortInterface;
 }
 

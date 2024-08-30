@@ -13,6 +13,7 @@ export class ReadManyDepositService {
     this.db = db;
   }
   public async handle(query: QueryInterface) {
+    query.filter["index"] = 0
     const match = [];
     if (query.filter['dateFrom'] && query.filter['dateTo'] && query.filter['dueDateTo'] && query.filter['dueDateFrom']) {
       try {

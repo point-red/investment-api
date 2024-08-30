@@ -57,6 +57,11 @@ export const validate = (body: any) => {
     paymentMethod: "required",
     interestRate: "required",
     taxRate: "required",
+    returns: "array|required",
+    "returns.*.baseDays": "required",
+    "returns.*.gross": "required",
+    "returns.*.taxAmount": "required",
+    "returns.*.net": "required",
     isCashback: "required",
   });
 
