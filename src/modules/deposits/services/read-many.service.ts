@@ -27,7 +27,7 @@ export class ReadManyDepositService {
         delete query.filter["dueDateTo"];
         delete query.filter["dueDateFrom"];
         match.push({
-          $or: [{ date: { $gte: dateFrom, $lte: dateTo } }, { deuDate: { $gte: dueDateFrom, $lte: dueDateTo } }],
+          $or: [{ date: { $gte: dateFrom, $lte: dateTo } }, { dueDate: { $gte: dueDateFrom, $lte: dueDateTo } }],
         });
       } catch (e) {}
     } else if (query.filter["dateFrom"] && query.filter["dateTo"]) {
@@ -155,9 +155,14 @@ export class ReadManyDepositService {
     const querySort: any = {};
     if (query.sort) {
       for (const key in query.sort) {
-        querySort[key] = query.sort[key] === "desc" ? -1 : 1;
+        if (query.sort[key] === "-1" || query.sort[key] === "desc") {
+          querySort[key] = -1;
+        } else {
+          querySort[key] = 1;
+        }
       }
     }
+    query.sort = querySort;
 
     // const pipeline = [
     //   ...(match.length > 0
