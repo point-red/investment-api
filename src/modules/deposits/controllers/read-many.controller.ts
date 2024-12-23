@@ -16,11 +16,7 @@ export interface ResponseInterface {
   pagination: PaginationInterface;
 }
 
-export const readMany = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const readMany = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const readManyDepositService = new ReadManyDepositService(db);
 
@@ -33,8 +29,8 @@ export const readMany = async (
       pageSize: Number(req.query.pageSize ?? 10),
       sort: (req.query.sort as any) ?? {},
     };
-
-    const result = await readManyDepositService.handle(iQuery);    
+    console.log("asdqoihfqoi asdjaoihsjdsa", iQuery.filter);
+    const result = await readManyDepositService.handle(iQuery);
 
     const pagination: PaginationInterface = {
       page: result.pagination.page,

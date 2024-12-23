@@ -23,18 +23,18 @@ export const banksSeed = [
     code: "BCA002",
     notes: "note",
     accounts: [
-        {
-          name: "Asep",
-          number: 1008367812522,
-          notes: "Lorem 1"
-        },
-        {
-          name: "Ujah",
-          number: 1008367812523,
-          notes: "Lorem 2"
-        }
+      {
+        name: "Asep",
+        number: 1008367812522,
+        notes: "Lorem 1",
+      },
+      {
+        name: "Ujah",
+        number: 1008367812523,
+        notes: "Lorem 2",
+      },
     ],
     createdBy_id: users[0]._id,
-    createdAt: new Date()
-}
+    createdAt: new Date(),
+  },
 ];

@@ -19,24 +19,15 @@ export class DepositRepository extends BaseRepository {
     super(db, "deposits");
   }
 
-  public async create(
-    doc: DocumentInterface,
-    options?: CreateOptionsInterface
-  ): Promise<CreateResultInterface> {
+  public async create(doc: DocumentInterface, options?: CreateOptionsInterface): Promise<CreateResultInterface> {
     return await this.collection().create(doc, options);
   }
 
-  public async read(
-    id: string,
-    options?: ReadOptionsInterface
-  ): Promise<ReadResultInterface> {
+  public async read(id: string, options?: ReadOptionsInterface): Promise<ReadResultInterface> {
     return await this.collection().read(id, options);
   }
 
-  public async readMany(
-    query: QueryInterface,
-    options?: ReadManyOptionsInterface
-  ): Promise<ReadManyResultInterface> {
+  public async readMany(query: QueryInterface, options?: ReadManyOptionsInterface): Promise<ReadManyResultInterface> {
     return await this.collection().readMany(query, options);
   }
 
@@ -52,10 +43,7 @@ export class DepositRepository extends BaseRepository {
     return await this.collection().update(id, document, options);
   }
 
-  public async delete(
-    id: string,
-    options?: DeleteOptionsInterface
-  ): Promise<DeleteResultInterface> {
+  public async delete(id: string, options?: DeleteOptionsInterface): Promise<DeleteResultInterface> {
     return await this.collection().delete(id, options);
   }
 }
