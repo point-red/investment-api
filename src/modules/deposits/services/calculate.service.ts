@@ -9,11 +9,11 @@ import { padWithZero } from "@src/utils/string.js";
 
 export class CalculateDepositService {
   public async calculate(body: DepositInterface, entity?: DepositInterface) {
-    let data: CreateDepositInterface = {
+    const data: CreateDepositInterface = {
       ...body,
     };
 
-    let date = new Date(data.date.replace(/(\d+[/])(\d+[/])/, "$2$1")).toISOString();
+    const date = new Date(data.date.replace(/(\d+[/])(\d+[/])/, "$2$1")).toISOString();
     data.date = format(data.date.replace(/(\d+[/])(\d+[/])/, "$2$1"), "yyyy-MM-dd");
     if (!entity) {
       const iQuery: QueryInterface = {
@@ -33,7 +33,7 @@ export class CalculateDepositService {
     }
 
     data.remaining = data.amount;
-    data.baseInterest = Math.floor((data.amount * (data.interestRate / 100)) / data.baseDate);
+    data.baseInterest = data.baseInterest;
     data.dueDate = format(addDay(date, data.tenor).toISOString(), "yyyy-MM-dd");
     data.grossInterest = data.baseInterest * data.tenor;
     data.taxAmount = Math.floor(data.grossInterest * (data.taxRate / 100));
@@ -72,13 +72,6 @@ export class CalculateDepositService {
       }
     } else {
       data.returns = [];
-    }
-
-    if (data.cashbacks) {
-      for (const cashback of data.cashbacks) {
-        cashback.amount = Math.floor(data.amount * (cashback.rate / 100));
-        cashback.remaining = cashback.amount;
-      }
     }
 
     if (typeof data.isCashback === "string") {

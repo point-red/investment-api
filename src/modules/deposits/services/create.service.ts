@@ -1,6 +1,4 @@
-import DatabaseConnection, {
-  DocumentInterface,
-} from "@src/database/connection.js";
+import DatabaseConnection, { DocumentInterface } from "@src/database/connection.js";
 import { DepositEntity } from "@src/modules/deposits/entities/deposit.entitiy.js";
 import { DepositRepository } from "@src/modules/deposits/repositories/deposit.repository.js";
 
@@ -61,10 +59,10 @@ export class CreateDepositService {
       note: doc.note,
       formStatus: doc.formStatus,
       createdBy: doc.createdBy,
-      index: 0
+      index: 0,
     });
-
     const depositRepository = new DepositRepository(this.db);
+
     return depositRepository.create(depositEntity.deposit, {
       session,
     });

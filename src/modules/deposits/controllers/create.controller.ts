@@ -21,7 +21,7 @@ export const create = async (req: RequestWithUser, res: Response, next: NextFunc
     const session = db.startSession();
 
     db.startTransaction();
-
+    console.log(req.body.baseInterest);
     if (req.body.formStatus === "complete") validate(req.body);
 
     const iQuery: QueryInterface = {
@@ -40,8 +40,8 @@ export const create = async (req: RequestWithUser, res: Response, next: NextFunc
     }
 
     const calculate = new CalculateDepositService();
-    const data: CreateDepositInterface = await calculate.calculate(req.body); 
-
+    const data: CreateDepositInterface = await calculate.calculate(req.body);
+    console.log(data);
     const createDepositService = new CreateDepositService(db);
     const result = await createDepositService.handle(
       {
