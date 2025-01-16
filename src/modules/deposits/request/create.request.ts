@@ -6,9 +6,7 @@ Validator.register(
   "unique",
   function (value, requirement, attribute) {
     const values = Object.assign([], value);
-    const uniqueData = Array.from(
-      new Set(values.map((row) => row[requirement]))
-    );
+    const uniqueData = Array.from(new Set(values.map((row) => row[requirement])));
     const isUnique = values.length === uniqueData.length;
     if (isUnique) {
       return true;
@@ -57,11 +55,6 @@ export const validate = (body: any) => {
     paymentMethod: "required",
     interestRate: "required",
     taxRate: "required",
-    returns: "array|required",
-    "returns.*.baseDays": "required",
-    "returns.*.gross": "required",
-    "returns.*.taxAmount": "required",
-    "returns.*.net": "required",
     isCashback: "required",
   });
 
